@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:recorridos_app/data/data.dart';
@@ -50,26 +51,15 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     } else {
       _distance = 120.0;
     }
-    // void _showToast(BuildContext context, String texto) {
-    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    //     backgroundColor: Colors.amber,
-    //     content: Text(
-    //       texto,
-    //       textAlign: TextAlign.center,
-    //     ),
-    //     duration: const Duration(seconds: 2),
-    //   ));
-    // }
 
     return WillPopScope(
       onWillPop: () {
         return Future(() => false);
       },
-      child: MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (_) => ProviderListener())
-          ],
-          child: MaterialApp(
+      child: ChangeNotifierProvider(
+        create: (_) => ProviderListener(),
+        child: Consumer<ProviderListener>(
+          builder: (context, provider, child) => MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Material App',
             home: Scaffold(
@@ -88,17 +78,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                         isCanceled != null)
                       _insertPlaces(),
                     const SizedBox(height: 10),
-                    SizedBox(
-                      child: Container(
-                        height: size.size.height / 1.8,
-                        child: ListView(
-                          shrinkWrap: true,
-                          children: [
-                            for (var menu in interactionMenuArray) menu,
-                          ],
-                        ),
-                      ),
-                    )
+                    _deleteIncidenceOptions(provider, size)
                   ],
                 ),
               ),
@@ -108,7 +88,29 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
               scaffoldBackgroundColor: Colors.grey[850],
               appBarTheme: const AppBarTheme(backgroundColor: Colors.amber),
             ),
-          )),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _deleteIncidenceOptions(
+      ProviderListener provider, MediaQueryData size) {
+    if (provider.itemIsReady?.timeEnd != null) {
+      if (interactionMenuArray.isNotEmpty) {
+        interactionMenuArray.removeRange(0, interactionMenuArray.length);
+      }
+    }
+    return SizedBox(
+      child: Container(
+        height: size.size.height / 1.8,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            for (var menu in interactionMenuArray) menu,
+          ],
+        ),
+      ),
     );
   }
 
