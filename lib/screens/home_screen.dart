@@ -130,6 +130,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                 iconData = const Icon(Icons.play_arrow);
                 getTimeValue;
                 isCanceled = true;
+                setState(() {});
               }
             },
             icon: iconData,
@@ -143,8 +144,10 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
               setState(() {});
               int index = interactionMenuArray.length - 1;
               if (index != -1) {
-                interactionMenuArray.removeAt(index);
-                contador -= 1;
+                if (interactionMenuArray[index].btnsave == true) {
+                  interactionMenuArray.removeAt(index);
+                  contador -= 1;
+                }
               }
             },
           ),
@@ -157,9 +160,10 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
               if (contador != 9) {
                 contador += 1;
                 interactionMenuArray.add(InteractionMenu(
-                  index: contador,
-                  usuario: widget.usuario,
-                ));
+                    index: contador,
+                    recorrido: recorrido,
+                    usuario: widget.usuario,
+                    btnsave: true));
               } else {
                 // _showToast(context, 'Solo se puede Agregar 10 Incidencias');
               }
