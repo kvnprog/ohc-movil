@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:recorridos_app/data/data.dart';
 import 'package:recorridos_app/data/places_data_class.dart';
-import 'package:recorridos_app/screens/screens.dart';
 import 'package:recorridos_app/services/provider_listener_service.dart';
+import 'package:recorridos_app/widgets/widgets.dart';
 
 // ignore: must_be_immutable
 class PlacesInteraction extends StatefulWidget {
@@ -35,6 +35,7 @@ class _PlacesInteractionState extends State<PlacesInteraction> {
     if(widget.func != null){
       widget.func!();
     }
+
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => ProviderListener())],
       child: Column(
@@ -102,6 +103,7 @@ class _PlacesInteractionState extends State<PlacesInteraction> {
                                   print('ya tiene incidencias generadas así que no se guardan');
                                 }
                                 print('hay ${widget.numeroDeIncidencias} incidencias hechas en ${widget.item.name}');
+                                
                              
                             }else{
                               //agrega un valor de inicio a un item que no ha sido inicializado
@@ -114,7 +116,6 @@ class _PlacesInteractionState extends State<PlacesInteraction> {
                               }
                             }
                           }
-
                       },
                     ),
                   ),
@@ -139,9 +140,9 @@ class _PlacesInteractionState extends State<PlacesInteraction> {
     Color isIconActive(){
      if (widget.item.isActive) {
       color = Colors.greenAccent[400]!;
-      }else{
+    }else{
         color = Colors.grey;
-      }
+    }
       if(widget.item.timeEnd != null){
       color = Colors.blue;
     }
