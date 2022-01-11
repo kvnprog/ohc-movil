@@ -283,7 +283,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     var respuesta = await http.post(url, body: {
       "index": recorrido,
     });
-
+    print('existo');
     return respuesta.body;
   }
 
