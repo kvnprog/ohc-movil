@@ -141,9 +141,9 @@ class _InteractionMenuState extends State<InteractionMenu> {
                 MaterialButton(
                   onPressed: widget.btnsave
                       ? () async {
-                          print(widget.usuario);
-                          print(widget.key);
-                          // print(base64Image);
+                          // print(widget.usuario);
+                          // print(widget.key);
+
                           var url = Uri.parse(
                               "https://pruebasmatch.000webhostapp.com/crear_incidencia_recorrido.php");
 
@@ -157,9 +157,13 @@ class _InteractionMenuState extends State<InteractionMenu> {
                             // final List json = jsonDecode(respuesta.body.toString());
                           }
 
-                          imageBytes =
-                              File(fotopreview[widget.index]).readAsBytesSync();
-                          base64Image = base64Encode(imageBytes!);
+                          if (fotopreview[widget.index] != '') {
+                            imageBytes = File(fotopreview[widget.index])
+                                .readAsBytesSync();
+                            base64Image = base64Encode(imageBytes!);
+                          } else {
+                            base64Image = '';
+                          }
                           btnload = false;
                           setState(() {});
                           await pedirdatos();
