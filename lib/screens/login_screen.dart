@@ -174,7 +174,6 @@ class _LoginFormState extends State<_LoginForm> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => HomeToursScreen(
-                                mode: Mode.defaultTheme,
                                 usuario: loginForm.usuario,
                                 acciones: respuesta.body,
                               ),
@@ -218,7 +217,6 @@ class _LoginFormState extends State<_LoginForm> {
                         MaterialPageRoute(
                           builder: (BuildContext context) => HomeToursScreen(
                             usuario: usuario,
-                            mode: Mode.defaultTheme,
                             acciones: respuesta.body,
                           ),
                         ),

@@ -186,9 +186,9 @@ class _InteractionMenuState extends State<InteractionMenu> {
                             // print(widget.lugar);
                             var url = Uri.parse(
                                 "https://pruebasmatch.000webhostapp.com/crear_incidencia_recorrido.php");
-                            print(widget.estado);
+                            print("soy yo ${widget.tipo}");
                             Future<void> pedirdatos() async {
-                              if (widget.estado == "Recorrido") {
+                              if (widget.tipo == "Recorrido") {
                                 await http.post(url, body: {
                                   "comentario": "${comentario.text}",
                                   "imagen": base64Image,

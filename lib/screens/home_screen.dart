@@ -233,6 +233,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
               _opcionSeleccionada != 'Recorrido' ||
               status != 'finished')
             ActionButton(
+              key: isFinished(3),
               onPressed: () {
                 setState(() {});
                 if (provider.itemIsReady != null ||
@@ -417,7 +418,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
         "https://pruebasmatch.000webhostapp.com/terminar_recorrido.php");
     var respuesta =
         await http.post(url, body: {"index": recorrido, "informacion": jsons});
-    print(respuesta.body);
+    print(jsons);
     return respuesta.body;
   }
 
