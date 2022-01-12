@@ -34,9 +34,7 @@ class InteractionMenu extends StatefulWidget {
       required this.acciones,
       required this.isNewMenuRequest,
       required this.btnsave,
-      required this.tipo
-      
-      })
+      required this.tipo})
       : super(key: key);
 
   @override
@@ -237,42 +235,6 @@ class _InteractionMenuState extends State<InteractionMenu> {
                             }
 
                             setState(() {});
-<<<<<<< HEAD
-=======
-                          });
-                        }
-                      : (null),
-                  color: Colors.amber,
-                  elevation: 1,
-                  child: Row(
-                    children: const [
-                      Icon(Icons.camera_alt_sharp),
-                      SizedBox(width: 5),
-                      Text('Foto'),
-                    ],
-                  ),
-                ),
-
-                //guardar la incidencia
-                MaterialButton(
-                  onPressed: widget.btnsave
-                      ? () async {
-                          // print(widget.usuario);
-                          // print(widget.key);
-
-                          var url = Uri.parse(
-                              "https://pruebasmatch.000webhostapp.com/crear_incidencia_recorrido.php");
-
-                          Future<void> pedirdatos() async {
-                            print('recibí el tipo ${widget.tipo}');
-                            await http.post(url, body: {
-                              "comentario": "${comentario.text}",
-                              "imagen": base64Image,
-                              "usuario": widget.usuario,
-                              "recorrido": widget.recorrido
-                            });
-                            // final List json = jsonDecode(respuesta.body.toString());
->>>>>>> 7a525ba1a71e47ed79bd88603809a4ae97a9f587
                           }
                         : (null),
                     disabledColor: Colors.greenAccent[400],
