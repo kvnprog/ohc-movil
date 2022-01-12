@@ -202,7 +202,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                   }
 
                   interactionMenuArray.add(InteractionMenu(
-                      estado: _opcionSeleccionada,
+                      tipo: _opcionSeleccionada,
                       lugar: lugar,
                       acciones: widget.acciones!,
                       isNewMenuRequest: menuRequest,
