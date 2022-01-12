@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:recorridos_app/data/data.dart';
@@ -150,6 +151,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
               } else {
                 //botón de detener
                 await terminarrecorrido();
+                // print(dataList.arrayPlaces[0].name);
                 iconData = const Icon(Icons.play_arrow);
                 getTimeValue;
                 isCanceled = true;
@@ -192,8 +194,15 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                   _opcionSeleccionada != 'Recorrido') {
                 if (contador != 9) {
                   contador += 1;
+                  var lugar;
+                  for (var element in dataList.arrayPlaces) {
+                    if (element.isActive == true) {
+                      lugar = element.name;
+                    }
+                  }
 
                   interactionMenuArray.add(InteractionMenu(
+                      lugar: lugar,
                       acciones: widget.acciones!,
                       isNewMenuRequest: menuRequest,
                       index: contador,
@@ -314,13 +323,21 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     return respuesta.body;
   }
 
+  List<String> datoss = [];
   Future<String> terminarrecorrido() async {
+    // for (var elemento in dataList.arrayPlaces) {
+    //   var datos = jsonEncode(elemento);
+    //   datoss.add(datos);
+    // }
+    var json = jsonEncode(dataList.arrayPlaces);
+
+    String jsons = json;
+
     var url = Uri.parse(
         "https://pruebasmatch.000webhostapp.com/terminar_recorrido.php");
-    var respuesta = await http.post(url, body: {
-      "index": recorrido,
-    });
-    print('existo');
+    var respuesta =
+        await http.post(url, body: {"index": recorrido, "informacion": jsons});
+    print(respuesta.body);
     return respuesta.body;
   }
 

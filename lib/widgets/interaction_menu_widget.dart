@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:camera/camera.dart';
 import 'package:provider/provider.dart';
+import 'package:recorridos_app/data/places_array_data_class.dart';
 import 'package:recorridos_app/screens/screens.dart';
 import 'package:recorridos_app/services/provider_listener_service.dart';
 
@@ -15,6 +16,7 @@ String? base64Image;
 class InteractionMenu extends StatefulWidget {
   final String? usuario;
   final String acciones;
+  final String? lugar;
   final index;
   final recorrido;
   bool btnsave;
@@ -22,6 +24,7 @@ class InteractionMenu extends StatefulWidget {
 
   InteractionMenu(
       {Key? key,
+      this.lugar,
       this.usuario,
       this.index,
       this.recorrido,
@@ -59,6 +62,8 @@ class _InteractionMenuState extends State<InteractionMenu> {
       }
     }
   }
+
+  PlacesArrayAvailableData dataList = PlacesArrayAvailableData();
 
   @override
   Widget build(BuildContext context) {
@@ -174,6 +179,7 @@ class _InteractionMenuState extends State<InteractionMenu> {
                             // print(widget.usuario);
                             // print(widget.key);
 
+                            print(widget.lugar);
                             var url = Uri.parse(
                                 "https://pruebasmatch.000webhostapp.com/crear_incidencia_recorrido.php");
 
@@ -183,7 +189,8 @@ class _InteractionMenuState extends State<InteractionMenu> {
                                 "imagen": base64Image,
                                 "usuario": widget.usuario,
                                 "recorrido": widget.recorrido,
-                                "tipo_inc": _opcionSeleccionada
+                                "tipo_inc": _opcionSeleccionada,
+                                "lugar": widget.lugar
                               });
                               // final List json = jsonDecode(respuesta.body.toString());
                             }
@@ -202,6 +209,7 @@ class _InteractionMenuState extends State<InteractionMenu> {
                               _actionType.remove(element);
                             }
                             setState(() {});
+
                             await pedirdatos();
                             btnload = true;
                             widget.btnsave = false;
