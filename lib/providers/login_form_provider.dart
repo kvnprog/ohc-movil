@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_mac/get_mac.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginFormProvider extends ChangeNotifier {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -19,9 +20,10 @@ class LoginFormProvider extends ChangeNotifier {
       Uri.parse("https://pruebasmatch.000webhostapp.com/checar_login.php");
 
   Future<String> pedirdatos() async {
-    String direccion = await GetMac.macAddress;
+    final prefs = await SharedPreferences.getInstance();
 
-    print("direcion mac: $direccion");
+    // Intenta leer datos de la clave del contador. Si no existe, retorna 0.
+    final direccion = prefs.getString('counter') ?? 'none';
 
     var respuesta = await http.post(url, body: {
       "usuario": usuario,
@@ -29,7 +31,7 @@ class LoginFormProvider extends ChangeNotifier {
       "direccion": direccion
     });
     // final List json = jsonDecode(respuesta.body.toString());
-    print(respuesta.body);
+    print(direccion);
     return respuesta.body;
   }
 

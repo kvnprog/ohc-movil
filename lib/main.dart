@@ -1,11 +1,13 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:recorridos_app/screens/screens.dart';
 import 'package:recorridos_app/services/provider_listener_service.dart';
 import 'package:splashscreen/splashscreen.dart';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(MyApp());
 
@@ -35,6 +37,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    // _deleteData();
     _justStringValue();
     _waitForValue();
   }
@@ -47,6 +50,7 @@ class _MyAppState extends State<MyApp> {
       home: SplashScreen(
         backgroundColor: Colors.amber,
         loaderColor: Colors.black,
+        seconds: 2,
         navigateAfterFuture: _waitForValue(),
         title: const Text('Splash Screen'),
         image: Image.asset('assets/walker.png'),
@@ -93,7 +97,11 @@ class _MyAppState extends State<MyApp> {
         }
       case 'login':
         {
-          return const LoginScreen();
+          final prefs = await SharedPreferences.getInstance();
+
+          // Intenta leer datos de la clave del contador. Si no existe, retorna 0.
+          final counter = prefs.getString('counter') ?? 'none';
+          return LoginScreen(codigo: counter);
         }
     }
   }
@@ -109,6 +117,20 @@ class _MyAppState extends State<MyApp> {
       });
       return rute;
     });
+  }
+}
+
+Future<bool> checar_codigo(valor) async {
+  var url =
+      Uri.parse("https://pruebasmatch.000webhostapp.com/checar_codigo.php");
+  var resultado = await http.post(url, body: {
+    "codigo": "$valor",
+  });
+
+  if (resultado.body == "true") {
+    return true;
+  } else {
+    return false;
   }
 }
 
@@ -181,8 +203,12 @@ class AlertPage extends StatelessWidget {
                     child: MaterialButton(
                         child: const Text('Aceptar'),
                         color: Colors.amber,
-                        onPressed: () {
-                          _saveData();
+                        onPressed: () async {
+                          if (await checar_codigo(code)) {
+                            _saveData();
+                          } else {}
+
+                          // _saveData();
                         }),
                   ),
                 ],

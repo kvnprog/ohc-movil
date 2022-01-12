@@ -10,12 +10,12 @@ import 'package:local_auth/local_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_mac/get_mac.dart';
 
-
 bool? checar;
 bool activobtn = false;
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  String? codigo;
+  LoginScreen({Key? key, this.codigo}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class LoginScreen extends StatelessWidget {
 // ChangeNotifierProvider fue importado del package provider
             ChangeNotifierProvider(
               create: (_) => LoginFormProvider(),
-              child: const _LoginForm(),
+              child: _LoginForm(codigo: codigo),
             )
           ]),
         ),
@@ -46,7 +46,8 @@ class LoginScreen extends StatelessWidget {
 }
 
 class _LoginForm extends StatefulWidget {
-  const _LoginForm({Key? key}) : super(key: key);
+  String? codigo;
+  _LoginForm({Key? key, this.codigo}) : super(key: key);
 
   @override
   State<_LoginForm> createState() => _LoginFormState();
@@ -182,7 +183,7 @@ class _LoginFormState extends State<_LoginForm> {
                           _showToast(
                               context, 'Contraseña o Dispositivo Equivocado');
                         }
-                    },
+                      },
               ),
               const SizedBox(height: 25),
               Align(
@@ -204,14 +205,19 @@ class _LoginFormState extends State<_LoginForm> {
                   onPressed: () async {
                     await checkingForBioMetrics();
                     await _authenticateMe();
+                    var url = Uri.parse(
+                        "https://pruebasmatch.000webhostapp.com/traer_acciones.php");
+                    var respuesta = await http.post(url, body: {});
 
                     if (checar == true) {
-                      String usuario = await checarusuario(await sacarmac());
+                      String usuario = await checarusuario(widget.codigo);
+                      print(usuario);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => HomeToursScreen(
                             usuario: usuario,
+                            acciones: respuesta.body,
                           ),
                         ),
                       );

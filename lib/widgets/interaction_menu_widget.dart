@@ -17,6 +17,7 @@ class InteractionMenu extends StatefulWidget {
   final String? usuario;
   final String acciones;
   final String? lugar;
+  final String? estado;
   final index;
   final recorrido;
   bool btnsave;
@@ -28,6 +29,7 @@ class InteractionMenu extends StatefulWidget {
       this.usuario,
       this.index,
       this.recorrido,
+      this.estado,
       required this.acciones,
       required this.isNewMenuRequest,
       required this.btnsave})
@@ -179,19 +181,31 @@ class _InteractionMenuState extends State<InteractionMenu> {
                             // print(widget.usuario);
                             // print(widget.key);
 
-                            print(widget.lugar);
+                            // print(widget.lugar);
                             var url = Uri.parse(
                                 "https://pruebasmatch.000webhostapp.com/crear_incidencia_recorrido.php");
-
+                            print(widget.estado);
                             Future<void> pedirdatos() async {
-                              await http.post(url, body: {
-                                "comentario": "${comentario.text}",
-                                "imagen": base64Image,
-                                "usuario": widget.usuario,
-                                "recorrido": widget.recorrido,
-                                "tipo_inc": _opcionSeleccionada,
-                                "lugar": widget.lugar
-                              });
+                              if (widget.estado == "Recorrido") {
+                                await http.post(url, body: {
+                                  "comentario": "${comentario.text}",
+                                  "imagen": base64Image,
+                                  "usuario": widget.usuario,
+                                  "recorrido": widget.recorrido,
+                                  "tipo_inc": _opcionSeleccionada,
+                                  "lugar": widget.lugar
+                                });
+                              } else {
+                                await http.post(url, body: {
+                                  "comentario": "${comentario.text}",
+                                  "imagen": base64Image,
+                                  "usuario": widget.usuario,
+                                  "recorrido": '-1',
+                                  "tipo_inc": _opcionSeleccionada,
+                                  "lugar": '-1'
+                                });
+                              }
+
                               // final List json = jsonDecode(respuesta.body.toString());
                             }
 
