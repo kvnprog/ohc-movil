@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 void main() => runApp(const HomeToursScreen());
 var contador = 0;
 var recorrido;
+bool menuRequest = false;
 
 class HomeToursScreen extends StatefulWidget {
   final String? usuario;
@@ -119,6 +120,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
       if (interactionMenuArray.isNotEmpty) {
         interactionMenuArray.removeRange(0, interactionMenuArray.length);
         contador = 0;
+        menuRequest = true;
       }
     }
     return SizedBox(
@@ -154,6 +156,10 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                 tourIsActive = false;
                 setState(() {});
                 provider.itemIsReady = null;
+                menuRequest = true;
+
+                interactionMenuArray.removeRange(
+                    0, interactionMenuArray.length);
               }
             },
             icon: iconData,
@@ -182,17 +188,21 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
           ActionButton(
             onPressed: () {
               setState(() {});
-              if (contador != 9) {
-                contador += 1;
+              if (provider.itemIsReady != null ||
+                  _opcionSeleccionada != 'Recorrido') {
+                if (contador != 9) {
+                  contador += 1;
 
-                interactionMenuArray.add(InteractionMenu(
-                    acciones: widget.acciones!,
-                    index: contador,
-                    recorrido: recorrido,
-                    usuario: widget.usuario,
-                    btnsave: true));
-              } else {
-                // _showToast(context, 'Solo se puede Agregar 10 Incidencias');
+                  interactionMenuArray.add(InteractionMenu(
+                      acciones: widget.acciones!,
+                      isNewMenuRequest: menuRequest,
+                      index: contador,
+                      recorrido: recorrido,
+                      usuario: widget.usuario,
+                      btnsave: true));
+                } else {
+                  // _showToast(context, 'Solo se puede Agregar 10 Incidencias');
+                }
               }
             }, //_sh_showAction(context, 0),
             icon: const Icon(Icons.new_label_sharp),
@@ -374,6 +384,10 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                   setTimeValue = time;
                   isActive = true;
                   tourIsActive = true;
+
+                  menuRequest = true;
+                  interactionMenuArray.removeRange(
+                      0, interactionMenuArray.length);
                 },
               ),
               TextButton(

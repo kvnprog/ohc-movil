@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:camera/camera.dart';
+import 'package:provider/provider.dart';
+import 'package:recorridos_app/screens/screens.dart';
+import 'package:recorridos_app/services/provider_listener_service.dart';
 
 List<String> fotopreview = ['', '', '', '', '', '', '', '', '', ''];
 String resultado = '';
@@ -15,12 +18,15 @@ class InteractionMenu extends StatefulWidget {
   final index;
   final recorrido;
   bool btnsave;
+  bool isNewMenuRequest;
+
   InteractionMenu(
       {Key? key,
       this.usuario,
       this.index,
       this.recorrido,
       required this.acciones,
+      required this.isNewMenuRequest,
       required this.btnsave})
       : super(key: key);
 
@@ -44,6 +50,17 @@ class _InteractionMenuState extends State<InteractionMenu> {
   dynamic _opcionSeleccionada = 'Acción';
 
   @override
+  void initState() {
+    super.initState();
+    final provider = Provider.of<ProviderListener>(context, listen: false);
+    if (provider.itemIsReady != null) {
+      if (widget.isNewMenuRequest && fotopreview[widget.index] != '') {
+        fotopreview[widget.index] = '';
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     var acciones = json.decode(widget.acciones);
 
@@ -51,48 +68,50 @@ class _InteractionMenuState extends State<InteractionMenu> {
       _actionType.add(element);
     }
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 25, left: 5, right: 5),
-      width: double.infinity,
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(20))),
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          children: <Widget>[
-            TextField(
-              controller: comentario,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                hintText: 'Ingrese un comentario',
-                icon: Icon(
-                  Icons.comment_sharp,
-                  color: Colors.amber,
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => ProviderListener())],
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 25, left: 5, right: 5),
+        width: double.infinity,
+        decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(20))),
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            children: <Widget>[
+              TextField(
+                controller: comentario,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: const InputDecoration(
+                  hintText: 'Ingrese un comentario',
+                  icon: Icon(
+                    Icons.comment_sharp,
+                    color: Colors.amber,
+                  ),
+                  hintMaxLines: 3,
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.amber, width: 2)),
                 ),
-                hintMaxLines: 3,
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.amber),
-                ),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.amber, width: 2)),
               ),
-            ),
-            SizedBox(height: height),
-            const Divider(),
-            (fotopreview[widget.index] == '')
-                ? (const Text(''))
-                : (Transform.rotate(
-                    angle: 0,
-                    child: Transform.scale(
-                        scale: 0.70,
-                        child: Image.file(
-                          File(fotopreview[widget.index]),
-                        )))),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                /*  //acciones a mostrar
+              SizedBox(height: height),
+              const Divider(),
+              (fotopreview[widget.index] == '')
+                  ? (const Text(''))
+                  : (Transform.rotate(
+                      angle: 0,
+                      child: Transform.scale(
+                          scale: 0.70,
+                          child: Image.file(
+                            File(fotopreview[widget.index]),
+                          )))),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  /*  //acciones a mostrar
                 MaterialButton(
                   onPressed: (){
                     
@@ -107,116 +126,117 @@ class _InteractionMenuState extends State<InteractionMenu> {
                     ],
                   ),
                 ), */
-                _dropDownOptions(),
-                // capturar foto de la incidencia
-                MaterialButton(
-                  onPressed: widget.btnsave
-                      ? () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const DisplayPictureScreen(),
-                            ),
-                          ).then((value) {
-                            if (value == null) {
-                              if (fotopreview[widget.index] != '') {
-                                print("imagen ${fotopreview[widget.index]}");
+                  _dropDownOptions(),
+                  // capturar foto de la incidencia
+                  MaterialButton(
+                    onPressed: widget.btnsave
+                        ? () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const DisplayPictureScreen(),
+                              ),
+                            ).then((value) {
+                              if (value == null) {
+                                if (fotopreview[widget.index] != '') {
+                                  print("imagen ${fotopreview[widget.index]}");
+                                }
+                              } else {
+                                fotopreview[widget.index] = value;
                               }
-                            } else {
-                              fotopreview[widget.index] = value;
+
+                              print(widget.index);
+                              var acciones = json.decode(widget.acciones);
+
+                              for (var element in acciones) {
+                                _actionType.remove(element);
+                              }
+                              setState(() {});
+                            });
+                          }
+                        : (null),
+                    color: Colors.amber,
+                    elevation: 1,
+                    child: Row(
+                      children: const [
+                        Icon(Icons.camera_alt_sharp),
+                        SizedBox(width: 5),
+                        Text('Foto'),
+                      ],
+                    ),
+                  ),
+
+                  //guardar la incidencia
+                  MaterialButton(
+                    onPressed: widget.btnsave
+                        ? () async {
+                            // print(widget.usuario);
+                            // print(widget.key);
+
+                            var url = Uri.parse(
+                                "https://pruebasmatch.000webhostapp.com/crear_incidencia_recorrido.php");
+
+                            Future<void> pedirdatos() async {
+                              await http.post(url, body: {
+                                "comentario": "${comentario.text}",
+                                "imagen": base64Image,
+                                "usuario": widget.usuario,
+                                "recorrido": widget.recorrido,
+                                "tipo_inc": _opcionSeleccionada
+                              });
+                              // final List json = jsonDecode(respuesta.body.toString());
                             }
 
-                            print(widget.index);
+                            if (fotopreview[widget.index] != '') {
+                              imageBytes = File(fotopreview[widget.index])
+                                  .readAsBytesSync();
+                              base64Image = base64Encode(imageBytes!);
+                            } else {
+                              base64Image = '';
+                            }
+                            btnload = false;
                             var acciones = json.decode(widget.acciones);
 
                             for (var element in acciones) {
                               _actionType.remove(element);
                             }
                             setState(() {});
-                          });
-                        }
-                      : (null),
-                  color: Colors.amber,
-                  elevation: 1,
-                  child: Row(
-                    children: const [
-                      Icon(Icons.camera_alt_sharp),
-                      SizedBox(width: 5),
-                      Text('Foto'),
-                    ],
+                            await pedirdatos();
+                            btnload = true;
+                            widget.btnsave = false;
+
+                            for (var element in acciones) {
+                              _actionType.remove(element);
+                            }
+
+                            setState(() {});
+                          }
+                        : (null),
+                    disabledColor: Colors.greenAccent[400],
+                    color: Colors.amber,
+                    elevation: 1,
+                    child: Row(
+                      children: [
+                        widget.btnsave
+                            ? btnload
+                                ? const Icon(Icons.save_sharp)
+                                : const SizedBox(
+                                    child: CircularProgressIndicator(
+                                      backgroundColor: Colors.white,
+                                      color: Colors.black,
+                                    ),
+                                    height: 15,
+                                    width: 15,
+                                  )
+                            : const Text('Guardado'),
+                      ],
+                    ),
                   ),
-                ),
-
-                //guardar la incidencia
-                MaterialButton(
-                  onPressed: widget.btnsave
-                      ? () async {
-                          // print(widget.usuario);
-                          // print(widget.key);
-
-                          var url = Uri.parse(
-                              "https://pruebasmatch.000webhostapp.com/crear_incidencia_recorrido.php");
-
-                          Future<void> pedirdatos() async {
-                            await http.post(url, body: {
-                              "comentario": "${comentario.text}",
-                              "imagen": base64Image,
-                              "usuario": widget.usuario,
-                              "recorrido": widget.recorrido,
-                              "tipo_inc": _opcionSeleccionada
-                            });
-                            // final List json = jsonDecode(respuesta.body.toString());
-                          }
-
-                          if (fotopreview[widget.index] != '') {
-                            imageBytes = File(fotopreview[widget.index])
-                                .readAsBytesSync();
-                            base64Image = base64Encode(imageBytes!);
-                          } else {
-                            base64Image = '';
-                          }
-                          btnload = false;
-                          var acciones = json.decode(widget.acciones);
-
-                          for (var element in acciones) {
-                            _actionType.remove(element);
-                          }
-                          setState(() {});
-                          await pedirdatos();
-                          btnload = true;
-                          widget.btnsave = false;
-
-                          for (var element in acciones) {
-                            _actionType.remove(element);
-                          }
-
-                          setState(() {});
-                        }
-                      : (null),
-                  disabledColor: Colors.greenAccent[400],
-                  color: Colors.amber,
-                  elevation: 1,
-                  child: Row(
-                    children: [
-                      widget.btnsave
-                          ? btnload
-                              ? const Icon(Icons.save_sharp)
-                              : const SizedBox(
-                                  child: CircularProgressIndicator(
-                                    backgroundColor: Colors.white,
-                                    color: Colors.black,
-                                  ),
-                                  height: 15,
-                                  width: 15,
-                                )
-                          : const Text('Guardado'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
