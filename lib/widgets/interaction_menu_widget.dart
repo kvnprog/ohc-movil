@@ -5,12 +5,13 @@ import 'package:http/http.dart' as http;
 import 'package:camera/camera.dart';
 
 List<String> fotopreview = ['', '', '', '', '', '', '', '', '', ''];
-
+String resultado = '';
 List<int>? imageBytes;
 String? base64Image;
 
 class InteractionMenu extends StatefulWidget {
   final String? usuario;
+  final String acciones;
   final index;
   final recorrido;
   bool btnsave;
@@ -19,6 +20,7 @@ class InteractionMenu extends StatefulWidget {
       this.usuario,
       this.index,
       this.recorrido,
+      required this.acciones,
       required this.btnsave})
       : super(key: key);
 
@@ -31,19 +33,24 @@ class _InteractionMenuState extends State<InteractionMenu> {
   double height = 15;
 
   bool btnload = true;
+
+  //metodo de traer acciones
+
   //lista de acciones disponibles
   final List<String> _actionType = [
     'Acción',
-    'Acción 1',
-    'Acción 2',
-    'Acción 3',
-    'Acción 4',
-    'Acción 5',
   ];
+
   dynamic _opcionSeleccionada = 'Acción';
 
   @override
   Widget build(BuildContext context) {
+    var acciones = json.decode(widget.acciones);
+
+    for (var element in acciones) {
+      _actionType.add(element);
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 25, left: 5, right: 5),
       width: double.infinity,
@@ -121,7 +128,11 @@ class _InteractionMenuState extends State<InteractionMenu> {
                             }
 
                             print(widget.index);
+                            var acciones = json.decode(widget.acciones);
 
+                            for (var element in acciones) {
+                              _actionType.remove(element);
+                            }
                             setState(() {});
                           });
                         }
@@ -152,7 +163,8 @@ class _InteractionMenuState extends State<InteractionMenu> {
                               "comentario": "${comentario.text}",
                               "imagen": base64Image,
                               "usuario": widget.usuario,
-                              "recorrido": widget.recorrido
+                              "recorrido": widget.recorrido,
+                              "tipo_inc": _opcionSeleccionada
                             });
                             // final List json = jsonDecode(respuesta.body.toString());
                           }
@@ -165,10 +177,19 @@ class _InteractionMenuState extends State<InteractionMenu> {
                             base64Image = '';
                           }
                           btnload = false;
+                          var acciones = json.decode(widget.acciones);
+
+                          for (var element in acciones) {
+                            _actionType.remove(element);
+                          }
                           setState(() {});
                           await pedirdatos();
                           btnload = true;
                           widget.btnsave = false;
+
+                          for (var element in acciones) {
+                            _actionType.remove(element);
+                          }
 
                           setState(() {});
                         }
@@ -226,8 +247,13 @@ class _InteractionMenuState extends State<InteractionMenu> {
                       color: Colors.white,
                     ),
                     onChanged: (opt) {
+                      _opcionSeleccionada = opt;
                       setState(() {
-                        _opcionSeleccionada = opt;
+                        var acciones = json.decode(widget.acciones);
+
+                        for (var element in acciones) {
+                          _actionType.remove(element);
+                        }
                       });
                     }),
               ),

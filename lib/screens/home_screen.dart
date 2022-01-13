@@ -13,7 +13,9 @@ var recorrido;
 
 class HomeToursScreen extends StatefulWidget {
   final String? usuario;
-  const HomeToursScreen({Key? key, this.usuario}) : super(key: key);
+  final String? acciones;
+  const HomeToursScreen({Key? key, this.usuario, this.acciones})
+      : super(key: key);
 
   @override
   State<HomeToursScreen> createState() => _HomeToursScreenState();
@@ -69,28 +71,32 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                 title: const Text('Recorridos'),
                 elevation: 0,
                 actions: <Widget>[
-                   IconButton(onPressed: ()=> Navigator.of(context).pop('login'), 
-                  icon: const Icon(Icons.login_outlined, color: Colors.black, size: 30,)),
+                  IconButton(
+                      onPressed: () => Navigator.of(context).pop('login'),
+                      icon: const Icon(
+                        Icons.login_outlined,
+                        color: Colors.black,
+                        size: 30,
+                      )),
                 ],
               ),
               body: Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(
                   children: [
-
                     //menú desplegable para elegir recorrido o incidencia normal
-                    if(!tourIsActive)
-                    _dropDownOptions(),
-                    
+                    if (!tourIsActive) _dropDownOptions(),
+
                     const SizedBox(height: 35),
 
-                  //lista de lugares disponibles para recorrer
-                    if (_opcionSeleccionada == 'Recorrido' && isCanceled != null)
-                    _insertPlaces(),
+                    //lista de lugares disponibles para recorrer
+                    if (_opcionSeleccionada == 'Recorrido' &&
+                        isCanceled != null)
+                      _insertPlaces(),
 
                     const SizedBox(height: 10),
 
-                  //menú de interacción para generar incidencias
+                    //menú de interacción para generar incidencias
                     _deleteIncidenceOptions(provider, size)
                   ],
                 ),
@@ -107,7 +113,8 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     );
   }
 
-  Widget _deleteIncidenceOptions(ProviderListener provider, MediaQueryData size){
+  Widget _deleteIncidenceOptions(
+      ProviderListener provider, MediaQueryData size) {
     if (provider.itemIsReady?.timeEnd != null) {
       if (interactionMenuArray.isNotEmpty) {
         interactionMenuArray.removeRange(0, interactionMenuArray.length);
@@ -153,7 +160,8 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
           ),
 
         //eliminar un campo de incidencia
-        if (isActive == true && isCanceled == false || _opcionSeleccionada != 'Recorrido')
+        if (isActive == true && isCanceled == false ||
+            _opcionSeleccionada != 'Recorrido')
           ActionButton(
             icon: const Icon(Icons.delete_forever),
             onPressed: () {
@@ -169,13 +177,16 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
           ),
 
         //agregar nuevo campo de crear incidencia
-        if (isActive == true && isCanceled == false || _opcionSeleccionada != 'Recorrido')
+        if (isActive == true && isCanceled == false ||
+            _opcionSeleccionada != 'Recorrido')
           ActionButton(
             onPressed: () {
               setState(() {});
               if (contador != 9) {
                 contador += 1;
+
                 interactionMenuArray.add(InteractionMenu(
+                    acciones: widget.acciones!,
                     index: contador,
                     recorrido: recorrido,
                     usuario: widget.usuario,
@@ -345,8 +356,8 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: const <Widget>[
-                 Text('Si aceptas, el tiempo empezará a contar inmediatamente y finalizará hasta que detengas el recorrido.'),
-                  
+                Text(
+                    'Si aceptas, el tiempo empezará a contar inmediatamente y finalizará hasta que detengas el recorrido.'),
               ],
             ),
             actions: <Widget>[
@@ -381,5 +392,4 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   get getTimeValue {
     return timeValue;
   }
-
 }

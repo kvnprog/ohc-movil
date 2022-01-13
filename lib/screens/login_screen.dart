@@ -155,6 +155,10 @@ class _LoginFormState extends State<_LoginForm> {
                 onPressed: activobtn
                     ? null
                     : () async {
+                        var url = Uri.parse(
+                            "https://pruebasmatch.000webhostapp.com/traer_acciones.php");
+                        var respuesta = await http.post(url, body: {});
+                        print(respuesta.body);
                         // FocusScope.of(context).unfocus();
                         setState(() {
                           activobtn = true;
@@ -169,6 +173,7 @@ class _LoginFormState extends State<_LoginForm> {
                             MaterialPageRoute(
                               builder: (context) => HomeToursScreen(
                                 usuario: loginForm.usuario,
+                                acciones: respuesta.body,
                               ),
                             ),
                           );
