@@ -193,7 +193,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     if (counter == 1) {
       counter = 10;
     }
-    print('algo');
+    print('');
     int mIndex = index;
     List<Places> arrayList = dataList.arrayPlaces;
     Map arrayListMap = arrayList.asMap();
