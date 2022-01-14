@@ -133,6 +133,52 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
           ),
         ));
   }
+
+
+  Widget _insertPlaces() {
+  final lenghtData = dataList.arrayPlaces.length;
+ 
+  placesArray();
+    return Column(
+      children: [
+        Container(
+        width: double.infinity,
+        height: 100,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          
+          itemCount: lenghtData,
+          //itemCount: whichIndex(),
+    
+            itemBuilder: (BuildContext context, int index)=>ListView(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(right: 33.0),
+              children: [
+                 PlacesInteraction( 
+                  fun: (){
+                    setState(() {});
+                    ProviderListener changeItemConfiguration = Provider.of<ProviderListener>(context, listen: false);
+                    Places itemUpdated = changeItemConfiguration.placeSelected = verMasListas(index);                  
+                    return  itemUpdated;
+                  },
+                  item: verMasListas(index),
+                  func: (){
+                    if(hasBeenCanceled == true){
+                        ProviderListener changeItemConfiguration = Provider.of<ProviderListener>(context, listen: false);
+                        return  changeItemConfiguration.setBoolValue = null;                 
+                    }
+                  },
+                ),
+              ],
+            ),
+        )
+      ),
+      ]
+    );
+  }
+
 }
 
 Widget _insertPlaces() {
