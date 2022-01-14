@@ -205,3 +205,16 @@ Widget _dropDownOptions() {
     ],
   );
 }
+
+List<DropdownMenuItem<String>> getItemsDropDown() {
+  List<DropdownMenuItem<String>> lista = [];
+
+  for (var element in _actionType) {
+    lista.add(DropdownMenuItem(
+      child: Text(element),
+      value: element,
+    ));
+  }
+
+  return lista;
+}
