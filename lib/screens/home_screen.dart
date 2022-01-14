@@ -40,6 +40,8 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   bool? isCanceled;
   bool hasBeenCanceled = false;
 
+  bool isActive = false;
+
   @override
   Widget build(BuildContext context) {
     MediaQueryData size = MediaQuery.of(context);
@@ -48,112 +50,124 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     } else {
       _distance = 120.0;
     }
+    // void _showToast(BuildContext context, String texto) {
+    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //     backgroundColor: Colors.amber,
+    //     content: Text(
+    //       texto,
+    //       textAlign: TextAlign.center,
+    //     ),
+    //     duration: const Duration(seconds: 2),
+    //   ));
+    // }
 
-    void _showToast(BuildContext context, String texto) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Colors.amber,
-        content: Text(
-          texto,
-          textAlign: TextAlign.center,
-        ),
-        duration: const Duration(seconds: 2),
-      ));
-    }
-
-    return MultiProvider(
-        providers: [ChangeNotifierProvider(create: (_) => ProviderListener())],
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Material App',
-          home: Scaffold(
-            resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              title: const Text('Recorridos'),
-              elevation: 0,
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  _dropDownOptions(),
-                  const SizedBox(height: 35),
-                  if (_opcionSeleccionada == 'Recorrido' && isCanceled != null)
-                    _insertPlaces(),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    child: Container(
-                      height: size.size.height / 1.8,
-                      child: ListView(
-                        shrinkWrap: true,
-                        children: [
-                          for (var menu in interactionMenuArray) menu,
-                        ],
-                      ),
-                    ),
-                  )
-                ],
+    return WillPopScope(
+      onWillPop: () {
+        return Future(() => false);
+      },
+      child: MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => ProviderListener())
+          ],
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Material App',
+            home: Scaffold(
+              resizeToAvoidBottomInset: false,
+              appBar: AppBar(
+                title: const Text('Recorridos'),
+                elevation: 0,
               ),
-            ),
-            floatingActionButton: ExpandableFab(
-              distance: _distance,
-              children: [
-                //finalizar el recorrido
-                if (_opcionSeleccionada == 'Recorrido')
-                  ActionButton(
-                    onPressed: () async {
-                      setState(() {});
-                      if (iconData.icon == const Icon(Icons.play_arrow).icon) {
-                        _mostrarAlerta(context);
-                      } else {
-                        //botón de detener
-
-                        await terminarrecorrido();
-                        iconData = const Icon(Icons.play_arrow);
-                        getTimeValue;
-                        isCanceled = true;
-                      }
-                    },
-                    icon: iconData,
-                  ),
-
-                //eliminar un campo de incidencia
-                ActionButton(
-                  icon: const Icon(Icons.delete_forever),
-                  onPressed: () {
-                    setState(() {});
-                    int index = interactionMenuArray.length - 1;
-                    if (index != -1) {
-                      interactionMenuArray.removeAt(index);
-                      contador -= 1;
-                    }
-                  },
+              body: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    _dropDownOptions(),
+                    const SizedBox(height: 35),
+                    if (_opcionSeleccionada == 'Recorrido' &&
+                        isCanceled != null)
+                      _insertPlaces(),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      child: Container(
+                        height: size.size.height / 1.8,
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: [
+                            for (var menu in interactionMenuArray) menu,
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-
-                //agregar nuevo campo de crear incidencia
-                ActionButton(
-                  onPressed: () {
-                    setState(() {});
-                    if (contador != 9) {
-                      contador += 1;
-                      interactionMenuArray.add(InteractionMenu(
-                        index: contador,
-                        usuario: widget.usuario,
-                      ));
-                    } else {
-                      _showToast(
-                          context, 'Solo se puede Agregar 10 Incidencias');
-                    }
-                  }, //_sh_showAction(context, 0),
-                  icon: const Icon(Icons.new_label_sharp),
-                ),
-              ],
+              ),
+              floatingActionButton: _floatingActionButtonOptions(),
             ),
+            theme: ThemeData(
+              scaffoldBackgroundColor: Colors.grey[850],
+              appBarTheme: const AppBarTheme(backgroundColor: Colors.amber),
+            ),
+          )),
+    );
+  }
+
+  Widget _floatingActionButtonOptions() {
+    return ExpandableFab(
+      distance: _distance,
+      children: [
+        //finalizar el recorrido
+        if (_opcionSeleccionada == 'Recorrido')
+          ActionButton(
+            onPressed: () async {
+              setState(() {});
+              if (iconData.icon == const Icon(Icons.play_arrow).icon) {
+                _mostrarAlerta(context);
+              } else {
+                //botón de detener
+
+                await terminarrecorrido();
+                iconData = const Icon(Icons.play_arrow);
+                getTimeValue;
+                isCanceled = true;
+              }
+            },
+            icon: iconData,
           ),
-          theme: ThemeData(
-            scaffoldBackgroundColor: Colors.grey[850],
-            appBarTheme: const AppBarTheme(backgroundColor: Colors.amber),
+
+        //eliminar un campo de incidencia
+        if (isActive == true)
+          ActionButton(
+            icon: const Icon(Icons.delete_forever),
+            onPressed: () {
+              setState(() {});
+              int index = interactionMenuArray.length - 1;
+              if (index != -1) {
+                interactionMenuArray.removeAt(index);
+                contador -= 1;
+              }
+            },
           ),
-        ));
+
+        //agregar nuevo campo de crear incidencia
+        if (isActive == true)
+          ActionButton(
+            onPressed: () {
+              setState(() {});
+              if (contador != 9) {
+                contador += 1;
+                interactionMenuArray.add(InteractionMenu(
+                  index: contador,
+                  usuario: widget.usuario,
+                ));
+              } else {
+                // _showToast(context, 'Solo se puede Agregar 10 Incidencias');
+              }
+            }, //_sh_showAction(context, 0),
+            icon: const Icon(Icons.new_label_sharp),
+          ),
+      ],
+    );
   }
 
   Widget _insertPlaces() {
@@ -193,6 +207,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                       return changeItemConfiguration.setBoolValue = null;
                     }
                   },
+                  numeroDeIncidencias: interactionMenuArray.length,
                 ),
               ],
             ),
@@ -324,18 +339,12 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                   String time =
                       "${TimeOfDay.now().hour}:${TimeOfDay.now().minute}";
                   recorrido = await crearrecorrido();
-                  print('soy al vaiable recorrido $recorrido');
                   setState(() {});
-
                   Navigator.of(context).pop();
                   iconData = const Icon(Icons.stop);
                   isCanceled = false;
                   setTimeValue = time;
-                  if (isCanceled!) {
-                    print(isCanceled!);
-                  } else {
-                    print(isCanceled!);
-                  }
+                  isActive = true;
                 },
               ),
               TextButton(

@@ -9,6 +9,7 @@ class Places {
   bool isActive;
   String? timeStart;
   String? timeEnd;
+  int? numeroDeIncidencias;
 
   
   Places({
@@ -17,9 +18,8 @@ class Places {
     required this.isActive,
     this.timeStart,
     this.timeEnd,
+    this.numeroDeIncidencias,
   });
-
-  
 
   Places copyWith({
     String? name,
@@ -27,6 +27,7 @@ class Places {
     bool? isActive,
     String? timeStart,
     String? timeEnd,
+    int? numeroDeIncidencias,
   }) {
     return Places(
       name: name ?? this.name,
@@ -34,6 +35,7 @@ class Places {
       isActive: isActive ?? this.isActive,
       timeStart: timeStart ?? this.timeStart,
       timeEnd: timeEnd ?? this.timeEnd,
+      numeroDeIncidencias: numeroDeIncidencias ?? this.numeroDeIncidencias,
     );
   }
 
@@ -44,6 +46,7 @@ class Places {
       'isActive': isActive,
       'timeStart': timeStart,
       'timeEnd': timeEnd,
+      'numeroDeIncidencias': numeroDeIncidencias,
     };
   }
 
@@ -54,6 +57,7 @@ class Places {
       isActive: map['isActive'] ?? false,
       timeStart: map['timeStart'],
       timeEnd: map['timeEnd'],
+      numeroDeIncidencias: map['numeroDeIncidencias']?.toInt(),
     );
   }
 
@@ -63,7 +67,7 @@ class Places {
 
   @override
   String toString() {
-    return 'Places(name: $name, icon: $icon, isActive: $isActive, timeStart: $timeStart, timeEnd: $timeEnd)';
+    return 'Places(name: $name, icon: $icon, isActive: $isActive, timeStart: $timeStart, timeEnd: $timeEnd, numeroDeIncidencias: $numeroDeIncidencias)';
   }
 
   @override
@@ -75,7 +79,8 @@ class Places {
       other.icon == icon &&
       other.isActive == isActive &&
       other.timeStart == timeStart &&
-      other.timeEnd == timeEnd;
+      other.timeEnd == timeEnd &&
+      other.numeroDeIncidencias == numeroDeIncidencias;
   }
 
   @override
@@ -84,6 +89,7 @@ class Places {
       icon.hashCode ^
       isActive.hashCode ^
       timeStart.hashCode ^
-      timeEnd.hashCode;
+      timeEnd.hashCode ^
+      numeroDeIncidencias.hashCode;
   }
 }
