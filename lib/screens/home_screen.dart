@@ -178,3 +178,30 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     ]);
   }
 }
+
+Widget _dropDownOptions() {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: <Widget>[
+      //const Icon(Icons.select_all),
+      const SizedBox(width: 30.0),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(10.0)),
+        child: DropdownButton(
+            value: _opcionSeleccionada,
+            items: getItemsDropDown(),
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+            underline: Container(
+              color: Colors.white,
+            ),
+            onChanged: (opt) {
+              setState(() {
+                _opcionSeleccionada = opt;
+              });
+            }),
+      )
+    ],
+  );
+}
