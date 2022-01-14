@@ -21,7 +21,10 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   dynamic _opcionSeleccionada = 'Recorrido';
   double _distance = 120.0;
   List<InteractionMenu> interactionMenuArray = [];
-  final dataList = PlacesArrayAvailableData();
+  
+  Icon iconData = const Icon(Icons.play_arrow);
+
+  PlacesArrayAvailableData dataList = PlacesArrayAvailableData(); 
 
   Places? itemSelected;
 
@@ -34,4 +37,114 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   String timeValue = '-1';
   bool? isCanceled;
   bool hasBeenCanceled = false;
+
+  @override
+  Widget build(BuildContext context){
+    if(_opcionSeleccionada != 'Recorrido'){
+      _distance = 80.50;
+    }else{
+      _distance = 120.0;
+    }
+
+    return MultiProvider(
+    providers: [
+        ChangeNotifierProvider(create: ( _ ) => ProviderListener()
+        )
+    ],
+
+    child: 
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Material App',
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Recorridos'),
+          elevation: 0,
+        ),
+        body: Padding(
+
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+
+               _dropDownOptions(),
+
+              const SizedBox( height: 35 ),
+
+              if(_opcionSeleccionada == 'Recorrido' && isCanceled!=null)
+              _insertPlaces(),
+
+              const SizedBox( height: 35 ),
+
+              SizedBox(
+                height: 450,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                     //InteractionMenu(),
+                    for(var menu in interactionMenuArray)
+                    menu,
+                  ],
+                ),
+              )
+
+            ],
+          ),
+        ),
+
+        floatingActionButton: ExpandableFab(
+        distance: _distance,
+        children: [
+
+          //finalizar el recorrido
+          if(_opcionSeleccionada == 'Recorrido')
+          ActionButton(
+            onPressed: (){
+              setState(() {});
+              if(iconData.icon == const Icon(Icons.play_arrow).icon){
+              _mostrarAlerta(context);
+              }
+              else{
+                //botón de detener
+                iconData = const Icon(Icons.play_arrow);
+                getTimeValue;
+                isCanceled = true;
+
+                
+              }
+            },
+            icon: iconData,
+          ),
+
+          //eliminar un campo de incidencia
+            ActionButton(
+            icon: const Icon(Icons.delete_forever),
+            onPressed: (){
+              setState(() {});
+              int index = interactionMenuArray.length - 1;
+              if (index != 0) {
+               interactionMenuArray.removeAt(index); 
+              }
+            },
+          ),
+
+          //agregar nuevo campo de crear incidencia
+          ActionButton(
+            onPressed: (){
+              setState((){});
+              interactionMenuArray.add(InteractionMenu());
+            },//_showAction(context, 0),
+            icon: const Icon(Icons.new_label_sharp),
+          ),
+
+ ],
+),
+),
+    theme: ThemeData(
+        scaffoldBackgroundColor: Colors.grey[850],
+        appBarTheme: const AppBarTheme(backgroundColor: Colors.amber),
+      ),
+));
+  }
+
 }
