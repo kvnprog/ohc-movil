@@ -12,8 +12,11 @@ class HomeToursScreen extends StatefulWidget {
   final String? usuario;
   const HomeToursScreen({Key? key, this.usuario}) : super(key: key);
 
+
   @override
   State<HomeToursScreen> createState() => _HomeToursScreenState();
+
+  
 }
 
 class _HomeToursScreenState extends State<HomeToursScreen> {
@@ -39,6 +42,8 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   bool hasBeenCanceled = false;
   
 
+  bool isActive = false;
+  
   @override
   Widget build(BuildContext context) {
     MediaQueryData size = MediaQuery.of(context);
@@ -47,42 +52,59 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     } else {
       _distance = 120.0;
     }
-
-    return MultiProvider(
-        providers: [ChangeNotifierProvider(create: (_) => ProviderListener())],
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Material App',
-          home: Scaffold(
-            resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              title: const Text('Recorridos'),
-              elevation: 0,
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  _dropDownOptions(),
-                  const SizedBox(height: 35),
-                  if (_opcionSeleccionada == 'Recorrido' && isCanceled != null)
-                    _insertPlaces(),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    child: Container(
-                      height: size.size.height / 1.8,
-                      child: ListView(
-                        shrinkWrap: true,
-                        children: [
-                          for (var menu in interactionMenuArray) menu,
-                        ],
-                      ),
-                    ),
-                  )
-                ],
+    return WillPopScope(
+      onWillPop: (){
+        return Future(()=>false);
+      },
+      child: MultiProvider(
+          providers: [ChangeNotifierProvider(create: (_) => ProviderListener())],
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Material App',
+            home: Scaffold(
+              resizeToAvoidBottomInset: false,
+              appBar: AppBar(
+                title: const Text('Recorridos'),
+                elevation: 0,
               ),
+              body: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  children: [
+    
+                    _dropDownOptions(),
+                    const SizedBox(height: 35),
+                    if (_opcionSeleccionada == 'Recorrido' && isCanceled != null)
+                      _insertPlaces(),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      child: Container(
+                        height: size.size.height / 1.8,
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: [
+                            for (var menu in interactionMenuArray) menu,
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+    
+              floatingActionButton: _floatingActionButtonOptions(),
             ),
-            floatingActionButton: ExpandableFab(
+            theme: ThemeData(
+              scaffoldBackgroundColor: Colors.grey[850],
+              appBarTheme: const AppBarTheme(backgroundColor: Colors.amber),
+            ),
+            
+          )),
+    );
+  }
+
+  Widget _floatingActionButtonOptions(){
+    return ExpandableFab(
               distance: _distance,
               children: [
                 //finalizar el recorrido
@@ -103,6 +125,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                   ),
 
                 //eliminar un campo de incidencia
+                if(isActive == true)
                 ActionButton(
                   icon: const Icon(Icons.delete_forever),
                   onPressed: () {
@@ -116,6 +139,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                 ),
 
                 //agregar nuevo campo de crear incidencia
+                if(isActive == true)
                 ActionButton(
                   onPressed: () {
                     setState(() {});
@@ -130,13 +154,8 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                   icon: const Icon(Icons.new_label_sharp),
                 ),
               ],
-            ),
-          ),
-          theme: ThemeData(
-            scaffoldBackgroundColor: Colors.grey[850],
-            appBarTheme: const AppBarTheme(backgroundColor: Colors.amber),
-          ),
-        ));
+            );
+            
   }
 
   Widget _insertPlaces() {
@@ -176,6 +195,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                       return changeItemConfiguration.setBoolValue = null;
                     }
                   },
+                  numeroDeIncidencias: interactionMenuArray.length,
                 ),
               ],
             ),
@@ -286,11 +306,12 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                 onPressed: () {
                   String time =
                       "${TimeOfDay.now().hour}:${TimeOfDay.now().minute}";
-                  setState(() {});
-                  Navigator.of(context).pop();
-                  iconData = const Icon(Icons.stop);
-                  isCanceled = false;
-                  setTimeValue = time;
+                      setState(() {});
+                      Navigator.of(context).pop();
+                      iconData = const Icon(Icons.stop);
+                      isCanceled = false;
+                      setTimeValue = time;
+                      isActive = true;
                 },
               ),
               TextButton(
@@ -310,3 +331,4 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     return timeValue;
   }
 }
+

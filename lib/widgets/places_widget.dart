@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:recorridos_app/data/data.dart';
 import 'package:recorridos_app/data/places_data_class.dart';
+import 'package:recorridos_app/screens/screens.dart';
 import 'package:recorridos_app/services/provider_listener_service.dart';
 
 // ignore: must_be_immutable
@@ -9,9 +10,11 @@ class PlacesInteraction extends StatefulWidget {
   Places item;
   Places Function()? fun;
   Function()? func;
+  int numeroDeIncidencias;
 
   PlacesInteraction({Key? key, 
     required this.item,
+    required this.numeroDeIncidencias,
     this.fun,
     this.func
   }) : super(key: key);
@@ -31,7 +34,6 @@ class _PlacesInteractionState extends State<PlacesInteraction> {
     final changeItemConfiguration = Provider.of<ProviderListener>(context, listen: false);
     if(widget.func != null){
       widget.func!();
-      print('si entré');
     }
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => ProviderListener())],
@@ -71,9 +73,12 @@ class _PlacesInteractionState extends State<PlacesInteraction> {
                       onTap: (){
                         setState(() {});
                         final time = '${TimeOfDay.now().hour}:${TimeOfDay.now().minute}';
+                        
                         //verifica si hay un item seleccionado para así no seleccionar otros sin antes haber finalizado el actual
                           if(changeItemConfiguration.itemIsReady == null){
                             print("if 1");
+                            colorActive = Colors.amber;
+                            //colorEnabled = Colors.grey;
                             changeItemConfiguration.setBoolValue = widget.item;
                             widget.fun!();
                             changeItemConfiguration.placeAffected;
@@ -84,20 +89,20 @@ class _PlacesInteractionState extends State<PlacesInteraction> {
                                 print("if 2");
                                 widget.fun!();
                                 widget.item.timeEnd = time;
-                                //////////
                                 
-                                /* if(changeItemConfiguration.itemIsReady!.timeStart == null){
-                                  changeItemConfiguration.setBoolValue = null;
-                                } */
-
-                                //////////
                                 changeItemConfiguration.placeAffected;
                                 setState(() {
                                   colorActive = Colors.transparent;
                                   color = Colors.blue;
                                   //colorEnabled = Colors.white10;
                                 });
-                                
+                                if(widget.item.numeroDeIncidencias == 0){
+                                  widget.item.numeroDeIncidencias = widget.numeroDeIncidencias;
+                                }else{
+                                  print('ya tiene incidencias generadas así que no se guardan');
+                                }
+                                print('hay ${widget.numeroDeIncidencias} incidencias hechas en ${widget.item.name}');
+                             
                             }else{
                               //agrega un valor de inicio a un item que no ha sido inicializado
                               if(changeItemConfiguration.itemIsReady!.timeEnd != null){
@@ -108,9 +113,6 @@ class _PlacesInteractionState extends State<PlacesInteraction> {
                                 widget.item.timeStart = time;
                               }
                             }
-                            
-                            print('niguno');
-                            print(widget.item);
                           }
 
                       },
