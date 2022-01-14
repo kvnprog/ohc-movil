@@ -179,51 +179,50 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   }
 
   Widget _dropDownOptions() {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.end,
-    children: <Widget>[
-      //const Icon(Icons.select_all),
-      const SizedBox(width: 30.0),
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
-        decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(10.0)),
-        child: DropdownButton(
-            value: _opcionSeleccionada,
-            items: getItemsDropDown(),
-            borderRadius: const BorderRadius.all(Radius.circular(10)),
-            underline: Container(
-              color: Colors.white,
-            ),
-            onChanged: (opt) {
-              setState(() {
-                _opcionSeleccionada = opt;
-              });
-            }),
-      )
-    ],
-  );
-}
-
-List<DropdownMenuItem<String>> getItemsDropDown() {
-  List<DropdownMenuItem<String>> lista = [];
-
-  for (var element in _actionType) {
-    lista.add(DropdownMenuItem(
-      child: Text(element),
-      value: element,
-    ));
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: <Widget>[
+        //const Icon(Icons.select_all),
+        const SizedBox(width: 30.0),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(10.0)),
+          child: DropdownButton(
+              value: _opcionSeleccionada,
+              items: getItemsDropDown(),
+              borderRadius: const BorderRadius.all(Radius.circular(10)),
+              underline: Container(
+                color: Colors.white,
+              ),
+              onChanged: (opt) {
+                setState(() {
+                  _opcionSeleccionada = opt;
+                });
+              }),
+        )
+      ],
+    );
   }
 
-  return lista;
-}
+  List<DropdownMenuItem<String>> getItemsDropDown() {
+    List<DropdownMenuItem<String>> lista = [];
 
-verMasListas(int index) {
-  
-  
-  int mIndex = index;
-  List<Places> arrayList = dataList.arrayPlaces;
-  Map arrayListMap = arrayList.asMap();
-  Places thisItem = arrayListMap[mIndex];
-  return thisItem;
+    for (var element in _actionType) {
+      lista.add(DropdownMenuItem(
+        child: Text(element),
+        value: element,
+      ));
+    }
+
+    return lista;
+  }
+
+  verMasListas(int index) {
+    int mIndex = index;
+    List<Places> arrayList = dataList.arrayPlaces;
+    Map arrayListMap = arrayList.asMap();
+    Places thisItem = arrayListMap[mIndex];
+    return thisItem;
+  }
 }
