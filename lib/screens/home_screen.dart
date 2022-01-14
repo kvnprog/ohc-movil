@@ -70,7 +70,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                   const SizedBox(height: 10),
                   SizedBox(
                     child: Container(
-                      height: size.size.height / 1.7,
+                      height: size.size.height / 1.8,
                       child: ListView(
                         shrinkWrap: true,
                         children: [
