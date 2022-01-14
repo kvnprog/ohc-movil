@@ -218,3 +218,17 @@ List<DropdownMenuItem<String>> getItemsDropDown() {
 
   return lista;
 }
+
+verMasListas(int index) {
+  int counter = 1;
+
+  if (counter == 1) {
+    counter = 10;
+  }
+  print('');
+  int mIndex = index;
+  List<Places> arrayList = dataList.arrayPlaces;
+  Map arrayListMap = arrayList.asMap();
+  Places thisItem = arrayListMap[mIndex];
+  return thisItem;
+}
