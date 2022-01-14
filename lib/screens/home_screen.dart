@@ -188,6 +188,12 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   }
 
   verMasListas(int index) {
+    int counter = 1;
+
+    if(counter == 1){
+      counter = 2;
+    }
+    
     int mIndex = index;
     List<Places> arrayList = dataList.arrayPlaces;
     Map arrayListMap = arrayList.asMap();
