@@ -177,9 +177,8 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
           )),
     ]);
   }
-}
 
-Widget _dropDownOptions() {
+  Widget _dropDownOptions() {
   return Row(
     mainAxisAlignment: MainAxisAlignment.end,
     children: <Widget>[
@@ -220,12 +219,8 @@ List<DropdownMenuItem<String>> getItemsDropDown() {
 }
 
 verMasListas(int index) {
-  int counter = 1;
-
-  if (counter == 1) {
-    counter = 10;
-  }
-  print('');
+  
+  
   int mIndex = index;
   List<Places> arrayList = dataList.arrayPlaces;
   Map arrayListMap = arrayList.asMap();
