@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       initialRoute: 'login',
       routes: {
         'login': (_) => const LoginScreen(),
-        'home': (_) => const HomeToursScreen()
+        'home': (_) =>  HomeToursScreen()
       },
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.grey[850],
