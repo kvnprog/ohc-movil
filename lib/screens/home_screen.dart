@@ -225,4 +225,83 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     Places thisItem = arrayListMap[mIndex];
     return thisItem;
   }
+
+  //llena un arreglo local con los valores de la dataClass
+  List<Places> placesArray() {
+    if (isCanceled!) {
+      mainArray.clear();
+      for (var item in dataList.arrayPlaces) {
+        item.isActive = false;
+        item.timeEnd = null;
+        item.timeStart = null;
+
+        mainArray.add(item);
+        hasBeenCanceled = true;
+      }
+    } else {
+      for (var item in dataList.arrayPlaces) {
+        mainArray.add(item);
+      }
+      hasBeenCanceled = false;
+    }
+    return mainArray;
+  }
+
+  void _mostrarAlerta(BuildContext context) {
+    late String message;
+
+    if (iconData.icon == const Icon(Icons.stop).icon) {
+      message = 'Detener recorrido';
+    } else {
+      message = 'Iniciar recorrido';
+    }
+
+    showDialog(
+        context: context,
+        //se puede cerrar haciendo click al rededor de la pantalla
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0)),
+            title: const Text('Estás por iniciar un nuevo recorrido'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const <Widget>[
+                Text(
+                    'Si aceptas, el tiempo empezará a contar inmediatamente y finalizará hasta que detengas el recorrido.'),
+                FlutterLogo(
+                  size: 100.0,
+                )
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text(message),
+                onPressed: () {
+                  String time =
+                      "${TimeOfDay.now().hour}:${TimeOfDay.now().minute}";
+                  setState(() {});
+                  Navigator.of(context).pop();
+                  iconData = const Icon(Icons.stop);
+                  isCanceled = false;
+                  setTimeValue = time;
+                },
+              ),
+              TextButton(
+                child: const Text('Cancelar'),
+                onPressed: () => Navigator.of(context).pop(),
+              )
+            ],
+          );
+        });
+  }
+
+  set setTimeValue(String newTimeValue) {
+    timeValue = newTimeValue;
+  }
+
+  get getTimeValue {
+    return timeValue;
+  }
 }
