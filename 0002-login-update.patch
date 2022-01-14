@@ -1,0 +1,657 @@
+From 48a8adf7b93dee802614ce89096c8a09f08ac4c0 Mon Sep 17 00:00:00 2001
+From: ProgDMMTD2 <88333386+ProgDMMTD2@users.noreply.github.com>
+Date: Tue, 21 Dec 2021 14:26:48 -0600
+Subject: [PATCH 2/2] login update
+
+---
+ 0001-login-update.patch | 638 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 638 insertions(+)
+ create mode 100644 0001-login-update.patch
+
+diff --git a/0001-login-update.patch b/0001-login-update.patch
+new file mode 100644
+index 0000000..784ed1c
+--- /dev/null
++++ b/0001-login-update.patch
+@@ -0,0 +1,638 @@
++From 210bc306bcde43fc148ec41a6ffb56706c2bc28b Mon Sep 17 00:00:00 2001
++From: ProgDMMTD2 <88333386+ProgDMMTD2@users.noreply.github.com>
++Date: Tue, 21 Dec 2021 12:26:43 -0600
++Subject: [PATCH] login update
++
++---
++ lib/main.dart                            |  27 ++---
++ lib/models/models.dart                   |   1 +
++ lib/models/product.dart                  |  46 +++++++
++ lib/providers/login_form_provider.dart   |  22 ++++
++ lib/providers/product_form_provider.dart |  28 +++++
++ lib/screens/login_screen.dart            | 148 +++++++++++++++++++++++
++ lib/ui/input_decorations.dart            |  35 ++++++
++ lib/widgets/auth_background.dart         | 102 ++++++++++++++++
++ lib/widgets/card_container.dart          |  37 ++++++
++ lib/widgets/widgets.dart                 |   3 +-
++ pubspec.lock                             |  15 +++
++ pubspec.yaml                             |   7 +-
++ 12 files changed, 450 insertions(+), 21 deletions(-)
++ create mode 100644 lib/models/models.dart
++ create mode 100644 lib/models/product.dart
++ create mode 100644 lib/providers/login_form_provider.dart
++ create mode 100644 lib/providers/product_form_provider.dart
++ create mode 100644 lib/screens/login_screen.dart
++ create mode 100644 lib/ui/input_decorations.dart
++ create mode 100644 lib/widgets/auth_background.dart
++ create mode 100644 lib/widgets/card_container.dart
++
++diff --git a/lib/main.dart b/lib/main.dart
++index acb8a67..39e2b08 100644
++--- a/lib/main.dart
+++++ b/lib/main.dart
++@@ -19,8 +19,6 @@ class _MyAppState extends State<MyApp> {
++   
++   @override
++   Widget build(BuildContext context) {
++-    
++-    _generateArrayPlaces();
++     return MaterialApp(
++       debugShowCheckedModeBanner: false,
++       title: 'Material App',
++@@ -50,7 +48,7 @@ class _MyAppState extends State<MyApp> {
++               const SizedBox( height: 35 ),
++ 
++               _insertPlaces(),
++-
+++            
++               InteractionMenu(),              
++             ],
++           )
++@@ -72,19 +70,21 @@ class _MyAppState extends State<MyApp> {
++     
++   }
++ 
++-  Container _insertPlaces() {
+++  Container _insertPlaces() {  
++     List<Places> placesArray = dataList.arrayPlaces;
++-
++-
++-    for (var item in placesArray) {
++-      
++-    }
++-
++     return Container(
++       width: double.infinity,
++       height: 100,
++ 
++-      
+++      child: ListView(
+++        scrollDirection: Axis.horizontal,
+++        children: <Widget>[
+++          
+++         for(var item in placesArray)
+++         PlacesInteraction(icon: const Icon(Icons.fastfood)),const SizedBox( width: 35 )
+++
+++        ],
+++      ),
++     );
++   }
++ 
++@@ -133,9 +133,8 @@ class _MyAppState extends State<MyApp> {
++     return lista;
++   }
++ 
++-  _generateArrayPlaces(){
++-    //final List<Places> arrayClass = dataList.arrayPlaces;
++-
+++   _generateArrayPlaces(){
+++  
++     
++   }
++ }
++\ No newline at end of file
++diff --git a/lib/models/models.dart b/lib/models/models.dart
++new file mode 100644
++index 0000000..87f22a7
++--- /dev/null
+++++ b/lib/models/models.dart
++@@ -0,0 +1 @@
+++export 'package:recorridos_app/models/product.dart';
++\ No newline at end of file
++diff --git a/lib/models/product.dart b/lib/models/product.dart
++new file mode 100644
++index 0000000..735c6d8
++--- /dev/null
+++++ b/lib/models/product.dart
++@@ -0,0 +1,46 @@
+++// To parse this JSON data, do
+++//
+++//     final product = productFromMap(jsonString);
+++import 'dart:convert';
+++
+++class Product {
+++    Product({
+++        required this.available,
+++        required this.name,
+++        this.picture,
+++        required this.price,
+++        this.id
+++    });
+++
+++    bool available;
+++    String name;
+++    String? picture;
+++    double price;
+++    String? id;
+++
+++    factory Product.fromJson(String str) => Product.fromMap(json.decode(str));
+++
+++    String toJson() => json.encode(toMap());
+++
+++    factory Product.fromMap(Map<String, dynamic> json) => Product(
+++        available: json["available"],
+++        name: json["name"],
+++        picture: json["picture"],
+++        price: json["price"].toDouble(),
+++    );
+++
+++    Map<String, dynamic> toMap() => {
+++        "available": available,
+++        "name": name,
+++        "picture": picture,
+++        "price": price,
+++    };
+++
+++    Product copy() => Product(
+++      available: available,
+++      name: name,
+++      picture: picture,
+++      price: price,
+++      id: id
+++    );
+++}
++diff --git a/lib/providers/login_form_provider.dart b/lib/providers/login_form_provider.dart
++new file mode 100644
++index 0000000..c4f7f7c
++--- /dev/null
+++++ b/lib/providers/login_form_provider.dart
++@@ -0,0 +1,22 @@
+++import 'package:flutter/material.dart';
+++
+++class LoginFormProvider extends ChangeNotifier{
+++
+++  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+++
+++
+++  String email = '';
+++  String password = '';
+++
+++  bool _isLoading = false;
+++  bool get isLoading => _isLoading;
+++  set isloading(bool value){
+++    _isLoading = value;
+++    notifyListeners();
+++  }
+++
+++  bool isValidForms(){
+++
+++    return formKey.currentState?.validate() ?? false;
+++  }
+++}
++\ No newline at end of file
++diff --git a/lib/providers/product_form_provider.dart b/lib/providers/product_form_provider.dart
++new file mode 100644
++index 0000000..defad50
++--- /dev/null
+++++ b/lib/providers/product_form_provider.dart
++@@ -0,0 +1,28 @@
+++import 'package:flutter/material.dart';
+++import 'package:recorridos_app/models/product.dart';
+++
+++class ProductFormProvider extends ChangeNotifier{
+++
+++  GlobalKey<FormState> formkey = GlobalKey();
+++
+++  Product product;
+++
+++  ProductFormProvider(this.product);
+++
+++  updateAvailability(bool value){
+++    product.available = value;
+++    notifyListeners();
+++  }
+++
+++
+++  bool isValidForm(){
+++    
+++    print(product.name);
+++    print(product.id);
+++    print(product.price);
+++
+++
+++    return formkey.currentState?.validate() ?? false;
+++  }
+++
+++}
++\ No newline at end of file
++diff --git a/lib/screens/login_screen.dart b/lib/screens/login_screen.dart
++new file mode 100644
++index 0000000..c050d98
++--- /dev/null
+++++ b/lib/screens/login_screen.dart
++@@ -0,0 +1,148 @@
+++// ignore_for_file: avoid_unnecessary_containers
+++
+++import 'package:flutter/material.dart';
+++import 'package:recorridos_app/providers/login_form_provider.dart';
+++import 'package:recorridos_app/ui/input_decorations.dart';
+++import 'package:recorridos_app/widgets/widgets.dart';
+++import 'package:provider/provider.dart';
+++
+++class LoginScreen extends StatelessWidget {
+++  const LoginScreen({Key? key}) : super(key: key);
+++
+++  @override
+++  Widget build(BuildContext context) {
+++
+++    return Scaffold(
+++      body: AuthBackground(
+++        child: SingleChildScrollView(
+++
+++          child: Column(
+++            children: [
+++
+++                const SizedBox( height: 280 ),
+++
+++                CardContainer(
+++                  child: Column(
+++                    children: [
+++
+++                      const SizedBox(height: 10),
+++                      Text('Login', style: Theme.of(context).textTheme.headline4),
+++                      const SizedBox(height: 30),
+++
+++// ChangeNotifierProvider fue importado del package provider
+++                      ChangeNotifierProvider(
+++                        create: ( _ ) => LoginFormProvider(),
+++                        child: const _LoginForm(),
+++                      )
+++      
+++                    ]
+++                  ),
+++                ),
+++
+++                const SizedBox(height: 50),
+++                const Text('Crear una nueva cuenta')
+++            ]
+++          ),
+++        )
+++        ),
+++    );
+++  }
+++}
+++
+++class _LoginForm extends StatelessWidget {
+++  const _LoginForm({Key? key}) : super(key: key);
+++  
+++  @override
+++  Widget build(BuildContext context) {
+++    final loginForm = Provider.of<LoginFormProvider>(context);
+++
+++    return Container(
+++      child: Form(
+++
+++        //key enlazada a la clase login_form_provider que nos permite gestionar el estado de si está logueado o no (importar provider y configurarlo para poder hacer el enlace)
+++        key: loginForm.formKey,
+++        autovalidateMode: AutovalidateMode.onUserInteraction,
+++
+++        child: Column(
+++          children: [
+++
+++              TextFormField(
+++                autocorrect: false,
+++                keyboardType: TextInputType.emailAddress,
+++                decoration: InputDecorations.authInputDecoration(
+++                  hintText: 'john.doe@gmail.com',
+++                  labelText: 'Correo electrónico',
+++                  prefixIcon: Icons.alternate_email_outlined
+++                ),
+++
+++                onChanged: ( value ) => loginForm.email = value,
+++                validator: ( value ){
+++
+++                  String pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+++                  RegExp regExp  = RegExp(pattern); 
+++
+++                  return regExp.hasMatch( value ?? '')
+++                    ? null
+++                    :'El correo no es correcto';
+++                },
+++              ),
+++
+++              const SizedBox(height: 30),
+++
+++              TextFormField(
+++                autocorrect: false,
+++                obscureText: true,
+++                keyboardType: TextInputType.visiblePassword,
+++                decoration: InputDecorations.authInputDecoration(
+++                   hintText: '******',
+++                  labelText: 'Contraseña',
+++                  prefixIcon: Icons.lock_outline
+++                ),
+++
+++                onChanged: ( value ) => loginForm.password = value,
+++                validator: ( value ){
+++
+++                  return (value != null && value.length>= 6)
+++                  ? null
+++                  : 'La contraseña debe ser de 6 caracteres';
+++                },
+++              ),
+++
+++              const SizedBox(height: 30),
+++
+++              MaterialButton(
+++                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+++                disabledColor: Colors.grey,
+++                elevation: 0,
+++                color: Colors.deepPurple,
+++                child: Container(
+++                  padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
+++                  child: Text(
+++                    loginForm.isLoading
+++                    ? 'Espere'
+++                    :'Ingresar',
+++                    style: const TextStyle(color: Colors.white)
+++                    )
+++                ),
+++                onPressed: loginForm.isLoading ? null : () async {
+++
+++                  FocusScope.of(context).unfocus();
+++
+++                  if( !loginForm.isValidForms() )return;
+++
+++                  loginForm.isloading = true;
+++
+++                  await Future.delayed(const Duration(seconds: 2));
+++
+++                  loginForm.isloading = false;
+++
+++                  Navigator.pushReplacementNamed(context, 'home');
+++                },
+++              )
+++
+++          ],
+++        ),
+++      ),
+++    );
+++  }
+++}
++\ No newline at end of file
++diff --git a/lib/ui/input_decorations.dart b/lib/ui/input_decorations.dart
++new file mode 100644
++index 0000000..c50f0ca
++--- /dev/null
+++++ b/lib/ui/input_decorations.dart
++@@ -0,0 +1,35 @@
+++import 'package:flutter/material.dart';
+++
+++class InputDecorations {
+++
+++  static InputDecoration authInputDecoration({
+++    required String hintText,
+++    required String labelText,
+++    IconData? prefixIcon
+++
+++  }){
+++  return InputDecoration(
+++                    enabledBorder: const UnderlineInputBorder(
+++                    borderSide: BorderSide(
+++                      color: Colors.purple
+++                      ),
+++                  ),
+++
+++                  focusedBorder: const UnderlineInputBorder(
+++                    borderSide: BorderSide(
+++                      color: Colors.purple,
+++                      width: 2
+++                    )
+++                  ),
+++
+++                  hintText: hintText,
+++                  labelText: labelText,
+++                  labelStyle: const TextStyle(
+++                    color: Colors.grey
+++                  ),
+++                  prefixIcon: prefixIcon != null
+++                  ? Icon(prefixIcon, color: Colors.purple,)
+++                  : null
+++                );
+++}
+++}
++\ No newline at end of file
++diff --git a/lib/widgets/auth_background.dart b/lib/widgets/auth_background.dart
++new file mode 100644
++index 0000000..34da5a4
++--- /dev/null
+++++ b/lib/widgets/auth_background.dart
++@@ -0,0 +1,102 @@
+++import 'package:flutter/material.dart';
+++
+++class AuthBackground extends StatelessWidget {
+++
+++  final Widget child;
+++
+++  const AuthBackground({
+++    Key? key,
+++     required this.child
+++  }) : super(key: key);
+++
+++  @override
+++  Widget build(BuildContext context) {
+++    return Container(
+++      width: double.infinity,
+++      height: double.infinity,
+++      child: Stack(
+++        children: [
+++          const _PurpleBox(),
+++
+++          const _HeaderIcon(),
+++
+++          child,
+++
+++        ],
+++      ),
+++    );
+++  }
+++}
+++
+++class _HeaderIcon extends StatelessWidget {
+++  //Nota, este constructor fue hecho extrayendo solo el widget de SafeArea
+++  const _HeaderIcon({
+++    Key? key,
+++  }) : super(key: key);
+++
+++  @override
+++  Widget build(BuildContext context) {
+++    // SafeArea es por si un dispositivo tiene un notch, el contenido se siga viendo bien
+++    return SafeArea(
+++        child: Container(
+++        width: double.infinity,
+++        margin: const EdgeInsets.only(top: 10),
+++        child: const Icon(Icons.person_pin, color: Colors.white, size: 100)
+++        ),
+++    );
+++  }
+++}
+++
+++class _PurpleBox extends StatelessWidget {
+++  const _PurpleBox({Key? key}) : super(key: key);
+++
+++  @override
+++  Widget build(BuildContext context) {
+++
+++    final size = MediaQuery.of(context).size;
+++    return Container(
+++      width: double.infinity,
+++      height: size.height * 0.4, //40%
+++      decoration: _buildBoxDecoration(),
+++
+++      //burbujas de fondo
+++      child: Stack(
+++        children: const[
+++          Positioned(child: _Bubble(), top: 60, left: 10,),
+++          Positioned(child: _Bubble(), top: -40, left: -30,),
+++          Positioned(child: _Bubble(), top: -50, right: -20,),
+++          Positioned(child: _Bubble(), top: 90, left: 150,),
+++          Positioned(child: _Bubble(), bottom: 50, right: 30,),
+++          Positioned(child: _Bubble(), bottom: -50, left: 30,),
+++        ],
+++      ),
+++    );
+++  }
+++
+++  BoxDecoration _buildBoxDecoration() {
+++    return BoxDecoration(
+++      gradient: LinearGradient(
+++        colors: [
+++          Color.fromRGBO(63, 63, 156, 1),
+++          Color.fromRGBO(90, 70, 178, 1)
+++        ]
+++      )
+++    );
+++  }
+++}
+++
+++class _Bubble extends StatelessWidget {
+++  const _Bubble({Key? key}) : super(key: key);
+++
+++  @override
+++  Widget build(BuildContext context) {
+++    return Container(
+++      width: 100,
+++      height: 100,
+++      decoration: BoxDecoration(
+++        borderRadius: BorderRadius.circular(100),
+++        color: Color.fromRGBO(255, 255, 255, 0.05)
+++      ),
+++    );
+++  }
+++}
++\ No newline at end of file
++diff --git a/lib/widgets/card_container.dart b/lib/widgets/card_container.dart
++new file mode 100644
++index 0000000..b2d0c70
++--- /dev/null
+++++ b/lib/widgets/card_container.dart
++@@ -0,0 +1,37 @@
+++import 'package:flutter/material.dart';
+++
+++class CardContainer extends StatelessWidget {
+++
+++  final Widget child;
+++
+++  const CardContainer({
+++    Key? key,
+++    required this.child
+++  }) : super(key: key);
+++
+++  @override
+++  Widget build(BuildContext context) {
+++    return Padding(
+++      padding: const EdgeInsets.symmetric(horizontal: 30),
+++      child: Container(
+++        
+++        padding: const EdgeInsets.all( 20 ),
+++        width: double.infinity,
+++        decoration: _createCardShape(),
+++        child: child,
+++      ),
+++    );
+++  }
+++
+++  BoxDecoration _createCardShape() => BoxDecoration(
+++    color: Colors.white,
+++    borderRadius: BorderRadius.circular(25),
+++    boxShadow: const[
+++      BoxShadow(
+++        color: Colors.black12,
+++        blurRadius: 20,
+++        offset: Offset(0,5)
+++      )
+++    ]
+++  );
+++}
++\ No newline at end of file
++diff --git a/lib/widgets/widgets.dart b/lib/widgets/widgets.dart
++index d9648f3..113280d 100644
++--- a/lib/widgets/widgets.dart
+++++ b/lib/widgets/widgets.dart
++@@ -1,3 +1,4 @@
++ export 'package:recorridos_app/widgets/interaction_menu_widget.dart';
++ export 'package:recorridos_app/widgets/places_widget.dart';
++-
+++export 'package:recorridos_app/widgets/auth_background.dart';
+++export 'package:recorridos_app/widgets/card_container.dart';
++\ No newline at end of file
++diff --git a/pubspec.lock b/pubspec.lock
++index c419538..0dcc4eb 100644
++--- a/pubspec.lock
+++++ b/pubspec.lock
++@@ -207,6 +207,13 @@ packages:
++       url: "https://pub.dartlang.org"
++     source: hosted
++     version: "1.7.0"
+++  nested:
+++    dependency: transitive
+++    description:
+++      name: nested
+++      url: "https://pub.dartlang.org"
+++    source: hosted
+++    version: "1.0.0"
++   package_config:
++     dependency: transitive
++     description:
++@@ -221,6 +228,13 @@ packages:
++       url: "https://pub.dartlang.org"
++     source: hosted
++     version: "1.8.0"
+++  provider:
+++    dependency: "direct main"
+++    description:
+++      name: provider
+++      url: "https://pub.dartlang.org"
+++    source: hosted
+++    version: "6.0.1"
++   pub_semver:
++     dependency: transitive
++     description:
++@@ -319,3 +333,4 @@ packages:
++     version: "3.1.0"
++ sdks:
++   dart: ">=2.15.0 <3.0.0"
+++  flutter: ">=1.16.0"
++diff --git a/pubspec.yaml b/pubspec.yaml
++index 9ad59b0..69ab7da 100644
++--- a/pubspec.yaml
+++++ b/pubspec.yaml
++@@ -31,14 +31,9 @@ dependencies:
++   flutter:
++     sdk: flutter
++   freezed: ^1.1.0
+++  provider: ^6.0.1
++ 
++ dev_dependencies:
++-
++-  # The "flutter_lints" package below contains a set of recommended lints to
++-  # encourage good coding practices. The lint set provided by the package is
++-  # activated in the `analysis_options.yaml` file located at the root of your
++-  # package. See that file for information about deactivating specific lint
++-  # rules and activating additional ones.
++   flutter_lints: ^1.0.0
++   flutter_test:
++     sdk: flutter
++-- 
++2.34.1
++
+-- 
+2.34.1
+

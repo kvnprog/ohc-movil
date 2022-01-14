@@ -1,0 +1,1 @@
+export 'package:recorridos_app/models/product.dart';
