@@ -191,7 +191,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     int counter = 1;
 
     if (counter == 1) {
-      counter = 2;
+      counter = 10;
     }
 
     int mIndex = index;
