@@ -311,6 +311,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   }
 
   get getTimeValue{
+    print('object');
     return timeValue;
   }
 
