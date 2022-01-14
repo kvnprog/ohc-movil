@@ -194,12 +194,4 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     Places thisItem = arrayListMap[mIndex];
     return thisItem;
   }
-
-  pruebas(int index) {
-    int mIndex = index;
-    List<Places> arrayList = dataList.arrayPlaces;
-    Map arrayListMap = arrayList.asMap();
-    Places thisItem = arrayListMap[mIndex];
-    return thisItem;
-  }
 }
