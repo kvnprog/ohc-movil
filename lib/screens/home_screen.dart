@@ -37,9 +37,11 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   String timeValue = '-1';
   bool? isCanceled;
   bool hasBeenCanceled = false;
+  
 
   @override
   Widget build(BuildContext context) {
+    MediaQueryData size = MediaQuery.of(context);
     if (_opcionSeleccionada != 'Recorrido') {
       _distance = 80.50;
     } else {
@@ -67,13 +69,14 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                     _insertPlaces(),
                   const SizedBox(height: 10),
                   SizedBox(
-                    height: 350,
-                    child: ListView(
-                      shrinkWrap: true,
-                      children: [
-                        //InteractionMenu(),
-                        for (var menu in interactionMenuArray) menu,
-                      ],
+                    child: Container(
+                      height: size.size.height / 1.7,
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: [
+                          for (var menu in interactionMenuArray) menu,
+                        ],
+                      ),
                     ),
                   )
                 ],
