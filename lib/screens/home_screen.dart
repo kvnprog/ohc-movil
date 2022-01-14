@@ -104,11 +104,11 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                   icon: const Icon(Icons.delete_forever),
                   onPressed: () {
                     setState(() {});
-                    int index = interactionMenuArray.length -1;
+                    int index = interactionMenuArray.length - 1;
                     if (index != -1) {
                       interactionMenuArray.removeAt(index);
+                      contador -= 1;
                     }
-                    
                   },
                 ),
 
@@ -116,12 +116,13 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                 ActionButton(
                   onPressed: () {
                     setState(() {});
-                    contador += 1;
-
-                    interactionMenuArray.add(InteractionMenu(
-                      index: contador,
-                      usuario: widget.usuario,
-                    ));
+                    if (contador != 9) {
+                      contador += 1;
+                      interactionMenuArray.add(InteractionMenu(
+                        index: contador,
+                        usuario: widget.usuario,
+                      ));
+                    } else {}
                   }, //_sh_showAction(context, 0),
                   icon: const Icon(Icons.new_label_sharp),
                 ),
