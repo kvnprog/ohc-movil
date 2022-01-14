@@ -76,14 +76,14 @@ class _LoginFormState extends State<_LoginForm> {
     return authenticated;
   }
 
-  void _showToast(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+  void _showToast(BuildContext context, String texto) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: Colors.amber,
       content: Text(
-        'Contraseña o Dispositivo incorrecto',
+        texto,
         textAlign: TextAlign.center,
       ),
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     ));
   }
 
@@ -173,7 +173,8 @@ class _LoginFormState extends State<_LoginForm> {
                             ),
                           );
                         } else {
-                          _showToast(context);
+                          _showToast(
+                              context, 'Contraseña o Dispositivo Equivocado');
                         }
                       },
               ),

@@ -4,9 +4,11 @@ import 'package:recorridos_app/data/data.dart';
 import 'package:recorridos_app/services/provider_listener_service.dart';
 import 'package:recorridos_app/widgets/timer_counter.dart';
 import 'package:recorridos_app/widgets/widgets.dart';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(const HomeToursScreen());
 var contador = 0;
+var recorrido;
 
 class HomeToursScreen extends StatefulWidget {
   final String? usuario;
@@ -37,7 +39,6 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   String timeValue = '-1';
   bool? isCanceled;
   bool hasBeenCanceled = false;
-  
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +47,17 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
       _distance = 80.50;
     } else {
       _distance = 120.0;
+    }
+
+    void _showToast(BuildContext context, String texto) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.amber,
+        content: Text(
+          texto,
+          textAlign: TextAlign.center,
+        ),
+        duration: const Duration(seconds: 2),
+      ));
     }
 
     return MultiProvider(
@@ -88,12 +100,14 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                 //finalizar el recorrido
                 if (_opcionSeleccionada == 'Recorrido')
                   ActionButton(
-                    onPressed: () {
+                    onPressed: () async {
                       setState(() {});
                       if (iconData.icon == const Icon(Icons.play_arrow).icon) {
                         _mostrarAlerta(context);
                       } else {
                         //botón de detener
+
+                        await terminarrecorrido();
                         iconData = const Icon(Icons.play_arrow);
                         getTimeValue;
                         isCanceled = true;
@@ -125,7 +139,10 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                         index: contador,
                         usuario: widget.usuario,
                       ));
-                    } else {}
+                    } else {
+                      _showToast(
+                          context, 'Solo se puede Agregar 10 Incidencias');
+                    }
                   }, //_sh_showAction(context, 0),
                   icon: const Icon(Icons.new_label_sharp),
                 ),
@@ -231,6 +248,26 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     return thisItem;
   }
 
+  Future<String> crearrecorrido() async {
+    var url =
+        Uri.parse("https://pruebasmatch.000webhostapp.com/crear_recorrido.php");
+    var respuesta = await http.post(url, body: {
+      "quien_capturo": widget.usuario,
+    });
+
+    return respuesta.body;
+  }
+
+  Future<String> terminarrecorrido() async {
+    var url = Uri.parse(
+        "https://pruebasmatch.000webhostapp.com/terminar_recorrido.php");
+    var respuesta = await http.post(url, body: {
+      "index": recorrido,
+    });
+
+    return respuesta.body;
+  }
+
   //llena un arreglo local con los valores de la dataClass
   List<Places> placesArray() {
     if (isCanceled!) {
@@ -283,14 +320,22 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
             actions: <Widget>[
               TextButton(
                 child: Text(message),
-                onPressed: () {
+                onPressed: () async {
                   String time =
                       "${TimeOfDay.now().hour}:${TimeOfDay.now().minute}";
+                  recorrido = await crearrecorrido();
+                  print('soy al vaiable recorrido $recorrido');
                   setState(() {});
+
                   Navigator.of(context).pop();
                   iconData = const Icon(Icons.stop);
                   isCanceled = false;
                   setTimeValue = time;
+                  if (isCanceled!) {
+                    print(isCanceled!);
+                  } else {
+                    print(isCanceled!);
+                  }
                 },
               ),
               TextButton(
