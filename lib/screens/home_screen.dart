@@ -65,9 +65,9 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                   const SizedBox(height: 35),
                   if (_opcionSeleccionada == 'Recorrido' && isCanceled != null)
                     _insertPlaces(),
-                  const SizedBox(height: 35),
+                  const SizedBox(height: 10),
                   SizedBox(
-                    height: 450,
+                    height: 350,
                     child: ListView(
                       shrinkWrap: true,
                       children: [
@@ -104,10 +104,11 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                   icon: const Icon(Icons.delete_forever),
                   onPressed: () {
                     setState(() {});
-                    int index = interactionMenuArray.length - 1;
-                    if (index != 0) {
+                    int index = interactionMenuArray.length -1;
+                    if (index != -1) {
                       interactionMenuArray.removeAt(index);
                     }
+                    
                   },
                 ),
 

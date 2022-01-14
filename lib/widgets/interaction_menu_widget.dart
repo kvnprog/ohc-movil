@@ -36,7 +36,7 @@ class _InteractionMenuState extends State<InteractionMenu> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 25, left: 25, right: 25),
+      margin: const EdgeInsets.only(bottom: 25, left: 5, right: 5),
       width: double.infinity,
       decoration: const BoxDecoration(
           color: Colors.white,
