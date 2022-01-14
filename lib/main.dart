@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('prueba');
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Recorridos',
