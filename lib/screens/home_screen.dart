@@ -177,9 +177,8 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
           )),
     ]);
   }
-}
 
-Widget _dropDownOptions() {
+  Widget _dropDownOptions() {
   return Row(
     mainAxisAlignment: MainAxisAlignment.end,
     children: <Widget>[
@@ -204,4 +203,26 @@ Widget _dropDownOptions() {
       )
     ],
   );
+}
+
+    List<DropdownMenuItem<String>> getItemsDropDown(){
+
+    List<DropdownMenuItem<String>> lista = [];
+
+    for (var element in _actionType) {
+      lista.add(DropdownMenuItem(
+        child: Text(element),
+        value: element,
+      ));
+    }
+
+    return lista;
+  }
+
+  verMasListas( int index ){
+    List<Places> arrayList = mainArray; 
+    Map arrayListMap = arrayList.asMap();
+    Places thisItem = arrayListMap[index];
+    return thisItem;
+  }
 }
