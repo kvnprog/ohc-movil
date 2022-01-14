@@ -28,4 +28,10 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   Chronometer chrono = Chronometer();
   bool isAvailable = false;
 
- 
+  List<Places> mainArray = [];
+  List<Places> mainArrayReset = [];
+
+  String timeValue = '-1';
+  bool? isCanceled;
+  bool hasBeenCanceled = false;
+}
