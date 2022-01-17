@@ -27,18 +27,19 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  local_auth: ^1.1.9
-  get_mac: ^0.0.1
-  camera:
-  path_provider:
-  path:
-  http: ^0.13.4 
+  camera: null
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
   flutter_hooks: ^0.18.1
   freezed: ^1.1.0
+  get_mac: ^0.0.1
   hooks_riverpod: ^1.0.3
+  http: ^0.13.4
+  local_auth: ^1.1.9
+  path: null
+  path_provider: null
+  permission_handler: ^8.3.0
   provider: ^6.0.1
 
 dev_dependencies:
@@ -56,8 +57,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
-assets:
-  - assets/
+  assets:
+      - assets/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

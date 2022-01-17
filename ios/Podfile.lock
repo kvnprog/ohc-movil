@@ -8,6 +8,8 @@ PODS:
     - Flutter
   - path_provider_ios (0.0.1):
     - Flutter
+  - "permission_handler (5.1.0+2)":
+    - Flutter
 
 DEPENDENCIES:
   - camera (from `.symlinks/plugins/camera/ios`)
@@ -15,6 +17,7 @@ DEPENDENCIES:
   - get_mac (from `.symlinks/plugins/get_mac/ios`)
   - local_auth (from `.symlinks/plugins/local_auth/ios`)
   - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
+  - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
 
 EXTERNAL SOURCES:
   camera:
@@ -27,6 +30,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/local_auth/ios"
   path_provider_ios:
     :path: ".symlinks/plugins/path_provider_ios/ios"
+  permission_handler:
+    :path: ".symlinks/plugins/permission_handler/ios"
 
 SPEC CHECKSUMS:
   camera: fe33292aff715a981eb34d7ce7b35b54337ff34c
@@ -34,6 +39,7 @@ SPEC CHECKSUMS:
   get_mac: b90f006186f20adf5b9d1f65b530599d39470b16
   local_auth: ef62030a2731330b95df7ef1331bd15f6a64b8a6
   path_provider_ios: 7d7ce634493af4477d156294792024ec3485acd5
+  permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
