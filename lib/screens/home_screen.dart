@@ -6,6 +6,7 @@ import 'package:recorridos_app/data/data.dart';
 import 'package:recorridos_app/services/provider_listener_service.dart';
 import 'package:recorridos_app/widgets/timer_counter.dart';
 import 'package:recorridos_app/widgets/widgets.dart';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(const HomeToursScreen());
 var contador = 0;
@@ -42,7 +43,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   String timeValue = '-1';
   bool? isCanceled;
   bool hasBeenCanceled = false;
-  
+  var recorrido;
 
   bool isActive = false;
   
@@ -269,6 +270,26 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     Map arrayListMap = arrayList.asMap();
     Places thisItem = arrayListMap[mIndex];
     return thisItem;
+  }
+
+  Future<String> crearrecorrido() async {
+    var url =
+        Uri.parse("https://pruebasmatch.000webhostapp.com/crear_recorrido.php");
+    var respuesta = await http.post(url, body: {
+      "quien_capturo": widget.usuario,
+    });
+
+    return respuesta.body;
+  }
+
+  Future<String> terminarrecorrido() async {
+    var url = Uri.parse(
+        "https://pruebasmatch.000webhostapp.com/terminar_recorrido.php");
+    var respuesta = await http.post(url, body: {
+      "index": recorrido,
+    });
+    print('existo');
+    return respuesta.body;
   }
 
   //llena un arreglo local con los valores de la dataClass
