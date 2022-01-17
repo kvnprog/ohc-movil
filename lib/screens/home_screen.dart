@@ -165,6 +165,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                     if (contador != 9) {
                       contador += 1;
                       interactionMenuArray.add(InteractionMenu(
+                        btnsave: true,
                         index: contador,
                         usuario: widget.usuario,
                       ));
