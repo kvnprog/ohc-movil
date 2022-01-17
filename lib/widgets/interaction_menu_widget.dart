@@ -5,13 +5,22 @@ import 'package:http/http.dart' as http;
 import 'package:camera/camera.dart';
 
 List<String> fotopreview = ['', '', '', '', '', '', '', '', '', ''];
+
 List<int>? imageBytes;
 String? base64Image;
 
 class InteractionMenu extends StatefulWidget {
   final String? usuario;
   final index;
-  const InteractionMenu({Key? key, this.usuario, this.index}) : super(key: key);
+  final recorrido;
+  bool btnsave;
+  InteractionMenu(
+      {Key? key,
+      this.usuario,
+      this.index,
+      this.recorrido,
+      required this.btnsave})
+      : super(key: key);
 
   @override
   _InteractionMenuState createState() => _InteractionMenuState();
@@ -20,7 +29,7 @@ class InteractionMenu extends StatefulWidget {
 class _InteractionMenuState extends State<InteractionMenu> {
   final comentario = TextEditingController();
   double height = 15;
-  bool btnsave = true;
+
   bool btnload = true;
   //lista de acciones disponibles
   final List<String> _actionType = [
@@ -94,26 +103,29 @@ class _InteractionMenuState extends State<InteractionMenu> {
                 _dropDownOptions(),
                 // capturar foto de la incidencia
                 MaterialButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DisplayPictureScreen(),
-                      ),
-                    ).then((value) {
-                      if (value == null) {
-                        if (fotopreview[widget.index] != '') {
-                          print("imagen ${fotopreview[widget.index]}");
+                  onPressed: widget.btnsave
+                      ? () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const DisplayPictureScreen(),
+                            ),
+                          ).then((value) {
+                            if (value == null) {
+                              if (fotopreview[widget.index] != '') {
+                                print("imagen ${fotopreview[widget.index]}");
+                              }
+                            } else {
+                              fotopreview[widget.index] = value;
+                            }
+
+                            print(widget.index);
+
+                            setState(() {});
+                          });
                         }
-                      } else {
-                        fotopreview[widget.index] = value;
-                      }
-
-                      print(widget.index);
-
-                      setState(() {});
-                    });
-                  },
+                      : (null),
                   color: Colors.amber,
                   elevation: 1,
                   child: Row(
@@ -127,7 +139,7 @@ class _InteractionMenuState extends State<InteractionMenu> {
 
                 //guardar la incidencia
                 MaterialButton(
-                  onPressed: btnsave
+                  onPressed: widget.btnsave
                       ? () async {
                           print(widget.usuario);
                           print(widget.key);
@@ -140,6 +152,7 @@ class _InteractionMenuState extends State<InteractionMenu> {
                               "comentario": "${comentario.text}",
                               "imagen": base64Image,
                               "usuario": widget.usuario,
+                              "recorrido": widget.recorrido
                             });
                             // final List json = jsonDecode(respuesta.body.toString());
                           }
@@ -151,7 +164,8 @@ class _InteractionMenuState extends State<InteractionMenu> {
                           setState(() {});
                           await pedirdatos();
                           btnload = true;
-                          btnsave = false;
+                          widget.btnsave = false;
+
                           setState(() {});
                         }
                       : (null),
@@ -160,7 +174,7 @@ class _InteractionMenuState extends State<InteractionMenu> {
                   elevation: 1,
                   child: Row(
                     children: [
-                      btnsave
+                      widget.btnsave
                           ? btnload
                               ? const Icon(Icons.save_sharp)
                               : const SizedBox(
@@ -184,36 +198,38 @@ class _InteractionMenuState extends State<InteractionMenu> {
   }
 
   Widget _dropDownOptions() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: <Widget>[
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          height: 38,
-          decoration: const BoxDecoration(
-              color: Colors.amber,
-              borderRadius: BorderRadius.all(Radius.circular(3.0))),
-          child: DropdownButton(
-              value: _opcionSeleccionada,
-              items: getItemsDropDown(),
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
-              dropdownColor: Colors.amber[200],
-              icon: const Icon(
-                Icons.warning_outlined,
-                color: Colors.black,
-                size: 25.0,
+    return widget.btnsave
+        ? Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                height: 38,
+                decoration: const BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.all(Radius.circular(3.0))),
+                child: DropdownButton(
+                    value: _opcionSeleccionada,
+                    items: getItemsDropDown(),
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    dropdownColor: Colors.amber[200],
+                    icon: const Icon(
+                      Icons.warning_outlined,
+                      color: Colors.black,
+                      size: 25.0,
+                    ),
+                    underline: Container(
+                      color: Colors.white,
+                    ),
+                    onChanged: (opt) {
+                      setState(() {
+                        _opcionSeleccionada = opt;
+                      });
+                    }),
               ),
-              underline: Container(
-                color: Colors.white,
-              ),
-              onChanged: (opt) {
-                setState(() {
-                  _opcionSeleccionada = opt;
-                });
-              }),
-        ),
-      ],
-    );
+            ],
+          )
+        : Row();
   }
 
   List<DropdownMenuItem<String>> getItemsDropDown() {
