@@ -10,6 +10,7 @@ import 'package:local_auth/local_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_mac/get_mac.dart';
 
+
 bool? checar;
 bool activobtn = false;
 
@@ -176,7 +177,7 @@ class _LoginFormState extends State<_LoginForm> {
                           _showToast(
                               context, 'Contraseña o Dispositivo Equivocado');
                         }
-                      },
+                    },
               ),
               const SizedBox(height: 25),
               Align(

@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:camera/camera.dart';
+import 'package:provider/provider.dart';
+import 'package:recorridos_app/screens/screens.dart';
+import 'package:recorridos_app/services/provider_listener_service.dart';
 
 List<String> fotopreview = ['', '', '', '', '', '', '', '', '', ''];
 
@@ -14,11 +17,14 @@ class InteractionMenu extends StatefulWidget {
   final index;
   final recorrido;
   bool btnsave;
+  bool isNewMenuRequest;
+
   InteractionMenu(
       {Key? key,
       this.usuario,
       this.index,
       this.recorrido,
+      required this.isNewMenuRequest,
       required this.btnsave})
       : super(key: key);
 
@@ -43,8 +49,22 @@ class _InteractionMenuState extends State<InteractionMenu> {
   dynamic _opcionSeleccionada = 'Acción';
 
   @override
+  void initState() {
+    super.initState(); 
+    final provider = Provider.of<ProviderListener>(context, listen: false);
+    if(provider.itemIsReady != null){
+      if(widget.isNewMenuRequest && fotopreview[widget.index] != ''){
+        fotopreview[widget.index] = '';
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
+
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => ProviderListener())],
+      child: Container(
       margin: const EdgeInsets.only(bottom: 25, left: 5, right: 5),
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -198,6 +218,7 @@ class _InteractionMenuState extends State<InteractionMenu> {
           ],
         ),
       ),
+    ),
     );
   }
 
