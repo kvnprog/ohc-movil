@@ -95,7 +95,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                   ],
                 ),
               ),
-              floatingActionButton: _floatingActionButtonOptions(),
+              floatingActionButton: _floatingActionButtonOptions(provider),
             ),
             theme: ThemeData(
               scaffoldBackgroundColor: Colors.grey[850],
@@ -111,6 +111,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     if (provider.itemIsReady?.timeEnd != null) {
       if (interactionMenuArray.isNotEmpty) {
         interactionMenuArray.removeRange(0, interactionMenuArray.length);
+        contador = 0;
       }
     }
     return SizedBox(
@@ -126,7 +127,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     );
   }
 
-  Widget _floatingActionButtonOptions() {
+  Widget _floatingActionButtonOptions(ProviderListener provider) {
     return ExpandableFab(
       distance: _distance,
       children: [
@@ -139,13 +140,13 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                 _mostrarAlerta(context);
               } else {
                 //botón de detener
-
                 await terminarrecorrido();
                 iconData = const Icon(Icons.play_arrow);
                 getTimeValue;
                 isCanceled = true;
                 tourIsActive = false;
                 setState(() {});
+                provider.itemIsReady = null;
               }
             },
             icon: iconData,
