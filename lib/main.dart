@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:recorridos_app/screens/screens.dart';
 import 'package:recorridos_app/services/provider_listener_service.dart';
+import 'package:splashscreen/splashscreen.dart';
 
 void main() => runApp(MyApp());
 
@@ -18,54 +21,115 @@ class AppState extends StatelessWidget {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   MyApp({Key? key}) : super(key: key);
-  String rute = '';
-  
-  @override
-  Widget build(BuildContext context) {
-    _readData();
-    if(_readData() == 'none'){
-      rute = 'deviceAuth';
-    }else{
-      print('vamos al login');
-      rute = 'login';
-    }
 
-    return MaterialApp(
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp>{
+  String rute = '';
+  String mData = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _justStringValue();
+    _waitForValue();
+  }
+ 
+  @override
+  Widget build(BuildContext context){
+      return MaterialApp (
       debugShowCheckedModeBanner: false,
       title: 'Recorridos',
-      initialRoute: rute,
-      routes: {
-        'login': (_) => const LoginScreen(),
-        'home': (_) => const HomeToursScreen(),
-
-        'deviceAuth': (_)=> AlertPage()
-      },
+      home: SplashScreen(
+        backgroundColor: Colors.amber,
+        loaderColor: Colors.black,
+        navigateAfterFuture: _waitForValue(),
+        title: const Text('Splash Screen'),
+        image: Image.asset('assets/walker.png'),
+      ),
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.grey[850],
         appBarTheme: const AppBarTheme(backgroundColor: Colors.amber),
       ),
     );
-    }
+  }
 
-    whichIsTheScreen(){
-      return AlertPage();
-    }
-
-    _readData() async{
+    Future<String> _readData() async{
+      print('estoy leyendo');
       final prefs = await SharedPreferences.getInstance();
 
       // Intenta leer datos de la clave del contador. Si no existe, retorna 0.
       final counter = prefs.getString('counter') ?? 'none';
 
-      print('estoy leyendo');
-      print(counter);
+      mData = counter;
+      return mData;
     }
 
+    _deleteData()async{
+      final prefs = await SharedPreferences.getInstance();
+
+      prefs.remove('counter');
+    }
+
+    _waitForValue() async{
+      if(rute == ''){
+        print('espero');
+        await _justStringValue();
+      }else{
+        print('no espero');
+      }
+
+      await Future.delayed(const Duration(seconds: 2));
+      print('la rute $rute');
+
+      switch(rute){
+        case 'deviceAuth':{
+         return AlertPage();
+        }
+        case 'login':{
+         return  const LoginScreen();
+        }
+      }
+    }
+
+    _justStringValue(){
+       _readData().then((value){
+         setState(() {
+        if(value == 'none'){
+          rute = 'deviceAuth';
+        }else{
+          rute = 'login';
+        }
+        });
+        return rute;
+      });
+    }
+}
+
+class AfterSplash extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title:const Text("Welcome In SplashScreen Package"),
+        automaticallyImplyLeading: false,
+      ),
+      body: const Center(
+        child:  Text(
+          "Succeeded!",
+          style:  TextStyle(fontWeight: FontWeight.bold, fontSize: 30.0),
+        ),
+      ),
+    );
+  }
 }
 
 
+// ignore: must_be_immutable
 class AlertPage extends StatelessWidget {
   AlertPage({Key? key}) : super(key: key);
   
@@ -134,7 +198,7 @@ class AlertPage extends StatelessWidget {
     _saveData() async {
       // obtener preferencias compartidas
       final prefs = await SharedPreferences.getInstance();
-
+      
       // fijar valor
       prefs.setString('counter', code);
       print('ya di el valor');
