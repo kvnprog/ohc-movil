@@ -45,11 +45,16 @@ class _MyAppState extends State<MyApp>{
       debugShowCheckedModeBanner: false,
       title: 'Recorridos',
       home: SplashScreen(
-        backgroundColor: Colors.amber,
+        seconds: 2,
         loaderColor: Colors.black,
         navigateAfterFuture: _waitForValue(),
-        title: const Text('Splash Screen'),
-        image: Image.asset('assets/walker.png'),
+        image: Image.asset('assets/walk.gif', width: 260, height: 260,),
+        useLoader: false,
+        photoSize: 205.0,
+        backgroundColor: Colors.amber,
+        loadingText: const Text('Cargando...', style: TextStyle(
+          fontSize: 10
+        ),),
       ),
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.grey[850],
@@ -59,7 +64,6 @@ class _MyAppState extends State<MyApp>{
   }
 
     Future<String> _readData() async{
-      print('estoy leyendo');
       final prefs = await SharedPreferences.getInstance();
 
       // Intenta leer datos de la clave del contador. Si no existe, retorna 0.
@@ -69,23 +73,13 @@ class _MyAppState extends State<MyApp>{
       return mData;
     }
 
-    _deleteData()async{
-      final prefs = await SharedPreferences.getInstance();
-
-      prefs.remove('counter');
-    }
-
     _waitForValue() async{
       if(rute == ''){
-        print('espero');
         await _justStringValue();
       }else{
-        print('no espero');
       }
 
-      await Future.delayed(const Duration(seconds: 2));
-      print('la rute $rute');
-
+      await Future.delayed(const Duration(seconds: 3));
       switch(rute){
         case 'deviceAuth':{
          return AlertPage();
@@ -109,25 +103,6 @@ class _MyAppState extends State<MyApp>{
       });
     }
 }
-
-class AfterSplash extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title:const Text("Welcome In SplashScreen Package"),
-        automaticallyImplyLeading: false,
-      ),
-      body: const Center(
-        child:  Text(
-          "Succeeded!",
-          style:  TextStyle(fontWeight: FontWeight.bold, fontSize: 30.0),
-        ),
-      ),
-    );
-  }
-}
-
 
 // ignore: must_be_immutable
 class AlertPage extends StatelessWidget {

@@ -18,6 +18,7 @@ class InteractionMenu extends StatefulWidget {
   final recorrido;
   bool btnsave;
   bool isNewMenuRequest;
+  String tipo;
 
   InteractionMenu(
       {Key? key,
@@ -25,7 +26,10 @@ class InteractionMenu extends StatefulWidget {
       this.index,
       this.recorrido,
       required this.isNewMenuRequest,
-      required this.btnsave})
+      required this.btnsave,
+      required this.tipo
+      
+      })
       : super(key: key);
 
   @override
@@ -168,6 +172,7 @@ class _InteractionMenuState extends State<InteractionMenu> {
                               "https://pruebasmatch.000webhostapp.com/crear_incidencia_recorrido.php");
 
                           Future<void> pedirdatos() async {
+                            print('recibí el tipo ${widget.tipo}');
                             await http.post(url, body: {
                               "comentario": "${comentario.text}",
                               "imagen": base64Image,

@@ -186,7 +186,9 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                     index: contador,
                     recorrido: recorrido,
                     usuario: widget.usuario,
-                    btnsave: true));
+                    btnsave: true,
+                    tipo: _opcionSeleccionada.toString(),
+                ));
               } else {
                 // _showToast(context, 'Solo se puede Agregar 10 Incidencias');
               }
