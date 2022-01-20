@@ -586,7 +586,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
    //eliminar el código
   _deleteData() async {
     final prefs = await SharedPreferences.getInstance();
-
+    print('soy el cambio');
     prefs.remove('status');
   }
 }
