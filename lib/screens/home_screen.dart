@@ -1,23 +1,38 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_intro/flutter_intro.dart';
 import 'package:provider/provider.dart';
 import 'package:recorridos_app/data/data.dart';
 import 'package:recorridos_app/services/provider_listener_service.dart';
-import 'package:recorridos_app/widgets/timer_counter.dart';
 import 'package:recorridos_app/widgets/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(const HomeToursScreen());
 var contador = 0;
 var recorrido;
 bool menuRequest = false;
+int setpsAvailable = 0;
+
+enum Mode {
+  defaultTheme,
+  customTheme,
+  advancedTheme,
+}
 
 class HomeToursScreen extends StatefulWidget {
   final String? usuario;
-  const HomeToursScreen({Key? key, this.usuario}) : super(key: key);
+  const HomeToursScreen({Key? key,
+    this.usuario,
+    this.mode
+  }) : super(key: key);
+
+  final Mode? mode;
 
   @override
-  State<HomeToursScreen> createState() => _HomeToursScreenState();
+  State<HomeToursScreen> createState() => _HomeToursScreenState(
+    mode: mode,
+  );
 }
 
 class _HomeToursScreenState extends State<HomeToursScreen> {
@@ -26,17 +41,17 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   double _distance = 120.0;
   List<InteractionMenu> interactionMenuArray = [];
 
+  Intro? intro;
+  bool widgetIsAvailable = false;
+
   Icon iconData = const Icon(Icons.play_arrow);
 
   PlacesArrayAvailableData dataList = PlacesArrayAvailableData();
 
   Places? itemSelected;
-
-  Chronometer chrono = Chronometer();
   bool isAvailable = false;
 
   List<Places> mainArray = [];
-  List<Places> mainArrayReset = [];
 
   String timeValue = '-1';
   bool? isCanceled;
@@ -44,17 +59,57 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
 
   bool isActive = false;
   bool tourIsActive = false;
+  int stepsCount = 1;
+
+  String status = 'nulo';
+
+  _HomeToursScreenState({
+    Mode? mode,
+    this.intro
+  });
 
   @override
-  Widget build(BuildContext context) {
-    MediaQueryData size = MediaQuery.of(context);
-    if (_opcionSeleccionada != 'Recorrido') {
-      _distance = 80.50;
-    } else {
-      _distance = 120.0;
-    }
+  void initState() {
+    super.initState();
+    Timer(
+      const Duration(
+        milliseconds: 500,
+      ),
+      () {
+        /// start the intro
+        intro!.start(context);
+      },
+    );
 
-    return WillPopScope(
+    _justStringValue();
+    _waitForValue();
+  }
+
+   @override
+  Widget build(BuildContext context){
+    print('status is $status');
+      if(status != 'nulo'){
+        if(status != 'finished'){
+          _stepsAvailable(Mode.defaultTheme, 7, [
+            'Menú para controlar la creación de incidencias y transcurso del recorrido.',
+            'Iniciar/Detener el recorrido.',
+            'Eliminar una incidencia antes de ser guardada.',
+            'Agregar un nuevo campo para generar una incidencia.',
+            'Espacio de trabajo donde podrá llenar los campos para generar las incidencias.',
+            'Listado horizontal de lugares de recorrido disponibles.',
+            'Menú desplegable para elegir sobre hacer un recorrido completo o solo generar una incidencia.',
+          ]);
+        }else{
+
+        }
+      MediaQueryData size = MediaQuery.of(context);
+      if (_opcionSeleccionada != 'Recorrido') {
+        _distance = 80.50;
+      } else {
+        _distance = 120.0;
+      }
+
+      return WillPopScope(
       onWillPop: () {
         return Future(() => false);
       },
@@ -78,9 +133,8 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                 padding: const EdgeInsets.all(10),
                 child: Column(
                   children: [
-
-                    //menú desplegable para elegir recorrido o incidencia normal
-                    if(!tourIsActive)
+                  //menú desplegable para elegir recorrido o incidencia normal
+                    if(!tourIsActive || status != 'finished')
                     _dropDownOptions(),
                     
                     const SizedBox(height: 35),
@@ -88,11 +142,13 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                   //lista de lugares disponibles para recorrer
                     if (_opcionSeleccionada == 'Recorrido' && isCanceled != null)
                     _insertPlaces(),
+                    if(status != 'finished')
+                    _insertPlaces(),
 
                     const SizedBox(height: 10),
 
                   //menú de interacción para generar incidencias
-                    _deleteIncidenceOptions(provider, size)
+                    _deleteIncidenceOptions(provider, size),
                   ],
                 ),
               ),
@@ -106,106 +162,141 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
         ),
       ),
     );
-  }
 
-  Widget _deleteIncidenceOptions(ProviderListener provider, MediaQueryData size){
-    if (provider.itemIsReady?.timeEnd != null) {
-      if (interactionMenuArray.isNotEmpty) {
-        interactionMenuArray.removeRange(0, interactionMenuArray.length);
-        contador = 0;
-        menuRequest = true;
-      }
+    }else{
+      _waitForValue();
+      return Container();
     }
-    return SizedBox(
-      child: Container(
-        height: size.size.height / 1.8,
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            for (var menu in interactionMenuArray) menu,
-          ],
-        ),
+  }
+  
+
+  //Functions and Methods
+  Widget _floatingActionButtonOptions(ProviderListener provider) {
+    late bool initialOpen;
+
+    status == 'finished' ? initialOpen = false : initialOpen = true;
+
+    return Container(
+      key: isFinished(0),
+      width: 200,
+      height: 190,
+      child: ExpandableFab(
+        initialOpen: initialOpen,
+        distance: _distance,
+        children: [
+          //iniciar/finalizar el recorrido
+          if (_opcionSeleccionada == 'Recorrido')
+            ActionButton(
+              key: isFinished(1),
+              onPressed: () async {
+                setState(() {});
+                print('soy el count $stepsCount');
+                
+                if (iconData.icon == const Icon(Icons.play_arrow).icon) {
+                  _mostrarAlerta(context);
+                  
+                } else {
+                  //botón de detener
+                  await terminarrecorrido();
+                  iconData = const Icon(Icons.play_arrow);
+                  getTimeValue;
+                  isCanceled = true;
+                  tourIsActive = false;
+                  setState(() {});
+                  provider.itemIsReady = null;
+                  menuRequest = true;
+                  interactionMenuArray.removeRange(0, interactionMenuArray.length);
+                }
+              },
+              icon: iconData,
+            ),
+
+          //eliminar un campo de incidencia
+          if (isActive == true && isCanceled == false || _opcionSeleccionada != 'Recorrido' || status != 'finished')
+            ActionButton(
+              key: isFinished(2),
+              icon: const Icon(Icons.delete_forever),
+              onPressed: () {
+                //2
+                setState(() {});
+                int index = interactionMenuArray.length - 1;
+                if (index != -1) {
+                  if (interactionMenuArray[index].btnsave == true) {
+                    interactionMenuArray.removeAt(index);
+                    contador -= 1;
+                  }
+                }
+              },
+            ),
+
+          //agregar nuevo campo de crear incidencia
+          if (isActive == true && isCanceled == false || _opcionSeleccionada != 'Recorrido' || status != 'finished')
+            ActionButton(
+              key: isFinished(3),
+              onPressed: () {
+                //3
+                setState(() {});
+                if(provider.itemIsReady != null || _opcionSeleccionada != 'Recorrido'){
+                if (contador != 9) {
+                  contador += 1;
+                  interactionMenuArray.add(InteractionMenu(
+                      isNewMenuRequest: menuRequest,
+                      index: contador,
+                      recorrido: recorrido,
+                      usuario: widget.usuario,
+                      btnsave: true,
+                      tipo: _opcionSeleccionada.toString(),
+                  ));
+
+                } else {
+                  // _showToast(context, 'Solo se puede Agregar 10 Incidencias');
+                }
+                }
+              }, //_sh_showAction(context, 0),
+              icon: const Icon(Icons.new_label_sharp),
+            ),
+        ],
       ),
     );
   }
 
-  Widget _floatingActionButtonOptions(ProviderListener provider) {
-    return ExpandableFab(
-      distance: _distance,
-      children: [
-        //finalizar el recorrido
-        if (_opcionSeleccionada == 'Recorrido')
-          ActionButton(
-            onPressed: () async {
-              setState(() {});
-              if (iconData.icon == const Icon(Icons.play_arrow).icon) {
-                _mostrarAlerta(context);
-              } else {
-                //botón de detener
-                await terminarrecorrido();
-                iconData = const Icon(Icons.play_arrow);
-                getTimeValue;
-                isCanceled = true;
-                tourIsActive = false;
-                setState(() {});
-                provider.itemIsReady = null;
-                menuRequest = true;
-                
-                interactionMenuArray.removeRange(0, interactionMenuArray.length);
-              }
-            },
-            icon: iconData,
-          ),
 
-        //eliminar un campo de incidencia
-        if (isActive == true && isCanceled == false || _opcionSeleccionada != 'Recorrido')
-          ActionButton(
-            icon: const Icon(Icons.delete_forever),
-            onPressed: () {
-              setState(() {});
-              int index = interactionMenuArray.length - 1;
-              if (index != -1) {
-                if (interactionMenuArray[index].btnsave == true) {
-                  interactionMenuArray.removeAt(index);
-                  contador -= 1;
-                }
-              }
-            },
-          ),
-
-        //agregar nuevo campo de crear incidencia
-        if (isActive == true && isCanceled == false || _opcionSeleccionada != 'Recorrido')
-          ActionButton(
-            onPressed: () {
-              setState(() {});
-              if(provider.itemIsReady != null || _opcionSeleccionada != 'Recorrido'){
-              if (contador != 9) {
-                contador += 1;
-                interactionMenuArray.add(InteractionMenu(
-                    isNewMenuRequest: menuRequest,
-                    index: contador,
-                    recorrido: recorrido,
-                    usuario: widget.usuario,
-                    btnsave: true,
-                    tipo: _opcionSeleccionada.toString(),
-                ));
-              } else {
-                // _showToast(context, 'Solo se puede Agregar 10 Incidencias');
-              }
-              }
-            }, //_sh_showAction(context, 0),
-            icon: const Icon(Icons.new_label_sharp),
-          ),
+  Widget _dropDownOptions() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: <Widget>[
+        //const Icon(Icons.select_all),
+        const SizedBox(width: 30.0),
+        Container(
+        key: isFinished(6),
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(10.0)),
+          child: DropdownButton(
+              value: _opcionSeleccionada,
+              items: getItemsDropDown(),
+              borderRadius: const BorderRadius.all(Radius.circular(10)),
+              underline: Container(
+                color: Colors.white,
+              ),
+              onChanged: (opt) {
+                setState(() {
+                  _opcionSeleccionada = opt;
+                });
+              }),
+        )
       ],
     );
   }
 
+
   Widget _insertPlaces() {
     final lenghtData = dataList.arrayPlaces.length;
-
     placesArray();
-    return Column(children: [
+    return Column(
+      children: [
       Container(
+          key: isFinished(5),
           width: double.infinity,
           height: 100,
           child: ListView.builder(
@@ -244,33 +335,39 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
           )),
     ]);
   }
+  
 
-  Widget _dropDownOptions() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: <Widget>[
-        //const Icon(Icons.select_all),
-        const SizedBox(width: 30.0),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(10.0)),
-          child: DropdownButton(
-              value: _opcionSeleccionada,
-              items: getItemsDropDown(),
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
-              underline: Container(
-                color: Colors.white,
-              ),
-              onChanged: (opt) {
-                setState(() {
-                  _opcionSeleccionada = opt;
-                });
-              }),
-        )
-      ],
+  Widget _deleteIncidenceOptions(ProviderListener provider, MediaQueryData size){
+    if (provider.itemIsReady?.timeEnd != null) {
+      if (interactionMenuArray.isNotEmpty) {
+        interactionMenuArray.removeRange(0, interactionMenuArray.length);
+        contador = 0;
+        menuRequest = true;
+      }
+    }
+    return SizedBox(
+      child: Container(
+        key: isFinished(4),
+        height: size.size.height / 1.8,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            for (var menu in interactionMenuArray) menu,
+          ],
+        ),
+      ),
     );
   }
+
+
+  Key? isFinished(int position){
+    if(status != 'finished'){
+      return intro!.keys[position];
+    }else{
+      return null;
+    }
+  }
+
 
   List<DropdownMenuItem<String>> getItemsDropDown() {
     List<DropdownMenuItem<String>> lista = [];
@@ -285,6 +382,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     return lista;
   }
 
+
   verMasListas(int index) {
     int mIndex = index;
     List<Places> arrayList = dataList.arrayPlaces;
@@ -292,6 +390,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     Places thisItem = arrayListMap[mIndex];
     return thisItem;
   }
+
 
   Future<String> crearrecorrido() async {
     var url =
@@ -303,6 +402,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     return respuesta.body;
   }
 
+
   Future<String> terminarrecorrido() async {
     var url = Uri.parse(
         "https://pruebasmatch.000webhostapp.com/terminar_recorrido.php");
@@ -313,9 +413,11 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
     return respuesta.body;
   }
 
+
   //llena un arreglo local con los valores de la dataClass
   List<Places> placesArray() {
-    if (isCanceled!) {
+    if(isCanceled != null){
+       if (isCanceled!) {
       mainArray.clear();
       for (var item in dataList.arrayPlaces) {
         item.isActive = false;
@@ -325,14 +427,25 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
         mainArray.add(item);
         hasBeenCanceled = true;
       }
-    } else {
-      for (var item in dataList.arrayPlaces) {
-        mainArray.add(item);
+      } else {
+        for (var item in dataList.arrayPlaces) {
+          mainArray.add(item);
+        }
+        hasBeenCanceled = false;
       }
-      hasBeenCanceled = false;
+    }else{
+      for (var item in dataList.arrayPlaces) {
+        item.isActive = false;
+        item.timeEnd = null;
+        item.timeStart = null;
+
+        mainArray.add(item);
+        hasBeenCanceled = true;
+      }
     }
     return mainArray;
   }
+
 
   void _mostrarAlerta(BuildContext context) {
     late String message;
@@ -388,12 +501,92 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   
   }
 
+
   set setTimeValue(String newTimeValue) {
     timeValue = newTimeValue;
   }
+
 
   get getTimeValue {
     return timeValue;
   }
 
+
+  _stepsAvailable(Mode mode, int steps, List<String> textSteps){
+     if (mode == Mode.defaultTheme) {
+      /// init Intro
+      intro = Intro(
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        stepCount: steps,
+        maskClosable: true,
+        onHighlightWidgetTap: (introStatus) {
+          print('soy el intro $introStatus');
+        },
+
+        /// use defaultTheme
+        widgetBuilder: StepWidgetBuilder.useDefaultTheme(
+          texts: [
+            for(String text in textSteps)
+            text,
+          ],
+          buttonTextBuilder: (currPage, totalPage) {
+            if(currPage < totalPage -1){
+              return 'Siguiente';
+            }else{
+              _saveData();
+              return 'Finalizar';
+            }
+
+          },
+        ),
+      );
+
+      intro!.setStepConfig(0,borderRadius: BorderRadius.circular(64));
+     }
+  }
+
+
+   //Shared Preferences
+  _saveData() async {
+      // obtener preferencias compartidas
+      final prefs = await SharedPreferences.getInstance();
+      
+      // fijar valor
+      prefs.setString('status', 'finished');
+  }
+
+
+  Future<String> _readData() async{
+      final prefs = await SharedPreferences.getInstance();
+
+      // Intenta leer datos de la clave del contador. Si no existe, retorna none.
+      final data = prefs.getString('status') ?? 'none';
+      return data;
+  }
+
+
+  _waitForValue() async{
+      if(status == 'nulo'){
+        await _justStringValue();
+      }else{
+        
+      }
+      await Future.delayed(const Duration(seconds: 3));
+  }
+
+
+  _justStringValue(){
+     _readData().then((value){
+       setState(() {
+        status = value; 
+       });
+    }); 
+  }
+
+   //eliminar el código
+  _deleteData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    prefs.remove('status');
+  }
 }

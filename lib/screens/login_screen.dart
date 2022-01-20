@@ -169,6 +169,7 @@ class _LoginFormState extends State<_LoginForm> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => HomeToursScreen(
+                                mode: Mode.defaultTheme,
                                 usuario: loginForm.usuario,
                               ),
                             ),
@@ -205,8 +206,9 @@ class _LoginFormState extends State<_LoginForm> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => HomeToursScreen(
+                          builder: (BuildContext context) => HomeToursScreen(
                             usuario: usuario,
+                            mode: Mode.defaultTheme,
                           ),
                         ),
                       );
@@ -225,3 +227,4 @@ class _LoginFormState extends State<_LoginForm> {
     );
   }
 }
+

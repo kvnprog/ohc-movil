@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:recorridos_app/screens/alert_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:recorridos_app/screens/screens.dart';
 import 'package:recorridos_app/services/provider_listener_service.dart';
@@ -48,6 +49,7 @@ class _MyAppState extends State<MyApp>{
         seconds: 2,
         loaderColor: Colors.black,
         navigateAfterFuture: _waitForValue(),
+        //navigateAfterSeconds: StartPage(),
         image: Image.asset('assets/walk.gif', width: 260, height: 260,),
         useLoader: false,
         photoSize: 205.0,
@@ -68,7 +70,6 @@ class _MyAppState extends State<MyApp>{
 
       // Intenta leer datos de la clave del contador. Si no existe, retorna 0.
       final counter = prefs.getString('counter') ?? 'none';
-
       mData = counter;
       return mData;
     }
@@ -102,6 +103,7 @@ class _MyAppState extends State<MyApp>{
         return rute;
       });
     }
+
 }
 
 // ignore: must_be_immutable
@@ -176,7 +178,5 @@ class AlertPage extends StatelessWidget {
       
       // fijar valor
       prefs.setString('counter', code);
-      print('ya di el valor');
     }
-
 }
