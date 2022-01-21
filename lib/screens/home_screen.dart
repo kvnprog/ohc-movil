@@ -134,7 +134,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
                 child: Column(
                   children: [
                   //menú desplegable para elegir recorrido o incidencia normal
-                    if(!tourIsActive || status != 'finished')
+                    if(tourIsActive == false)
                     _dropDownOptions(),
                     
                     const SizedBox(height: 35),
@@ -190,8 +190,6 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
               key: isFinished(1),
               onPressed: () async {
                 setState(() {});
-                print('soy el count $stepsCount');
-                
                 if (iconData.icon == const Icon(Icons.play_arrow).icon) {
                   _mostrarAlerta(context);
                   
