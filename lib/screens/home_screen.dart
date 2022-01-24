@@ -169,17 +169,18 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
   //Functions and Methods
   Widget _floatingActionButtonOptions(ProviderListener provider) {
     late bool initialOpen;
-
+    MediaQueryData size = MediaQuery.of(context);
     status == 'finished' ? initialOpen = false : initialOpen = true;
 
     return Container(
       key: isFinished(0),
-      width: 200,
-      height: 190,
+      width: size.size.width/2,
+      height: size.size.height/2.5,
       child: ExpandableFab(
         initialOpen: initialOpen,
         distance: _distance,
         children: [
+          
           //iniciar/finalizar el recorrido
           if (_opcionSeleccionada == 'Recorrido')
             ActionButton(
@@ -519,7 +520,7 @@ class _HomeToursScreenState extends State<HomeToursScreen> {
       intro = Intro(
         borderRadius: const BorderRadius.all(Radius.circular(10)),
         stepCount: steps,
-        maskClosable: true,
+        maskClosable: false,
         onHighlightWidgetTap: (introStatus) {
           print('soy el intro $introStatus');
         },
